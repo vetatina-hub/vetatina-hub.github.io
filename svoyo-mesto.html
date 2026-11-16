@@ -85,7 +85,7 @@ details summary{cursor:pointer;color:var(--gold);font-weight:700}
 <button id="snd" onclick="sndToggle()" aria-label="Звук">🔇</button>
 <div class="wrap"><div id="app"></div></div>
 <script>
-/* ===== ИГРА «СВОЁ МЕСТО» v6 — Диагностика жизни (методика Венеры Татиной) ===== */
+/* ===== ИГРА «СВОЁ МЕСТО» v6.2 — Диагностика жизни (методика Венеры Татиной) ===== */
 const AREAS=["Деньги","Отношения","Здоровье и тело","Предназначение","Семья и род","Внутреннее состояние"];
 const AREACOST={"Деньги":"деньги проходят мимо тебя или уходят на других","Отношения":"в паре повторяется то же чужое место","Здоровье и тело":"тело устаёт держать то, что не твоё","Предназначение":"твоё дело ждёт, пока ты развернёшься к нему","Семья и род":"в семье ты несёшь то, что тебе не принадлежит","Внутреннее состояние":"внутри нет покоя: ты всё время в чужой жизни"};
 const NOUN={mm:{N:"Мама",n:"мама",G:"мамы",D:"маме",A:"маму",I:"мамой",she:"она",her:"её",herD:"ей",o:"папу",oN:"Папа",la:"а",lo:"ла",sm:"маленькая",cl:"прозрачная",bg:"большая",sd:"Грустная",nd:"недоступна"},pp:{N:"Папа",n:"папа",G:"папы",D:"папе",A:"папу",I:"папой",she:"он",her:"его",herD:"ему",o:"маму",oN:"Мама",la:"",lo:"",sm:"маленький",cl:"прозрачный",bg:"большой",sd:"Грустный",nd:"недоступен"}};
@@ -102,18 +102,22 @@ const SGAZE=[["mm","На маму"],["pp","На папу"],["between","Межд�
 
 /* Где ты стоишь в жизни: над родителями (o), с претензией (c), в детской позиции (k) */
 const QS=[
-["o","Ты даёшь маме или папе советы: как жить, лечиться, тратить деньги?","даёшь родителям советы, как им жить","Когда мы учим родителей, мы встаём над ними. Это место их мамы или папы, а не твоё."],
-["c","Вспомни детство. Есть то, за что тебе до сих пор обидно на маму или папу?","до сих пор носишь детскую обиду","Детская обида держит твой взгляд на родителях, а не на твоей жизни."],
-["k","Когда трудно, ты ждёшь, что кто-то придёт и поможет: родители, партнёр, кто-то ещё?","ждёшь, что кто-то придёт и поможет","Ждать, что придут и помогут, — детская позиция. Взрослый делает шаг сам."],
-["o","Ты злишься, когда родители делают «не так», как ты им сказала?","злишься, когда родители делают «не так»","Злость на то, что они «делают не так», — знак, что ты встала выше них."],
-["c","Бывает мысль: «мне недодали» — любви, внимания, поддержки, денег?","думаешь «мне недодали»","«Мне недодали» разворачивает тебя лицом к прошлому и спиной к своей жизни."],
-["k","Родители до сих пор помогают тебе деньгами или решают за тебя?","родители помогают деньгами или решают за тебя","Пока за тебя решают другие, твоя сила остаётся у них."],
-["o","Мама или папа жалуется тебе на жизнь или друг на друга, а ты утешаешь и решаешь?","утешаешь родителей и решаешь их проблемы","Когда ребёнок становится опорой для родителя, он встаёт на чужое место."],
-["c","Хочется, чтобы мама или папа наконец признали, что были неправы?","ждёшь, что родители признают свою неправоту","Ожидание, что они признают, держит тебя в споре с ними."],
-["k","Ты откладываешь важные решения, пока кто-то не скажет «давай»?","откладываешь решения, пока кто-то не скажет «давай»","Без чужого «давай» ты не начинаешь: решение отдано другим."],
-["o","Ты чувствуешь, что в семье ты «самая взрослая» и всё держится на тебе?","чувствуешь, что всё держится на тебе","«Всё держится на мне» — так чувствует себя тот, кто стоит не на своём месте."],
-["c","С родителями ты общаешься из долга, а внутри холодно или напряжённо?","общаешься с родителями из долга, а внутри холодно","Когда сердце закрыто к маме и папе, закрыт и поток рода: к деньгам, любви, здоровью."],
-["k","Сложно брать ответственность за свои деньги: «пусть кто-то другой решит»?","отдаёшь ответственность за деньги другим","Отдать ответственность за деньги — значит отдать и сами деньги."]];
+{t:"o",k:"pp",q:"Ты даёшь советы, как жить: как лечиться, тратить деньги, вести дом?",m:"даёшь советы, как жить: {w}",c:"D"},
+{t:"c",k:"pp",q:"Вспомни детство. Есть то, за что тебе до сих пор обидно?",m:"до сих пор носишь детскую обиду: на {w}",c:"A"},
+{t:"k",k:"one",q:"Когда трудно, ты ждёшь, что кто-то придёт и поможет?",m:"ждёшь, что кто-то придёт и поможет"},
+{t:"o",k:"pp",q:"Ты злишься, когда они делают «не так», как ты сказала?",m:"злишься, когда делают «не так»: на {w}",c:"A"},
+{t:"c",k:"multi",q:"Как ты чувствуешь: чего тебе недодали в детстве?",h:"Можно несколько.",o:[["love","Любви"],["att","Внимания"],["sup","Поддержки"],["mon","Денег"],["ok","Всего хватало"]],g:{love:"любви",att:"внимания",sup:"поддержки",mon:"денег"},m:"чувствуешь, что недодали: {w}"},
+{t:"k",k:"pp",q:"До сих пор помогают тебе деньгами?",m:"до сих пор берёшь деньги: у {w}",c:"G"},
+{t:"o",k:"pp",q:"Жалуются тебе на жизнь, а ты утешаешь и решаешь их проблемы?",m:"утешаешь и решаешь проблемы: {w}",c:"D"},
+{t:"c",k:"pp",q:"Хочется, чтобы наконец признали, что были неправы?",m:"ждёшь признания, что были неправы: от {w}",c:"G"},
+{t:"k",k:"pp",q:"До сих пор решают за тебя, как тебе жить?",m:"отдаёшь решения о своей жизни: {w}",c:"D"},
+{t:"o",k:"one",q:"Ты чувствуешь, что в семье ты «самая взрослая» и всё держится на тебе?",m:"чувствуешь, что всё держится на тебе"},
+{t:"c",k:"ppopt",q:"Что внутри, когда ты общаешься?",o:[["warm","Тепло",0],["duty","Общаюсь из долга",1],["cold","Холодно",2],["tense","Напряжённо",2],["none","Не общаемся",2]],ph:{duty:"общаешься из долга",cold:"внутри холодно",tense:"внутри напряжённо",none:"не общаетесь"}},
+{t:"k",k:"one",q:"Ты откладываешь важные решения, пока кто-то не скажет «давай»?",m:"откладываешь решения, пока кто-то не скажет «давай»"},
+{t:"k",k:"one",q:"Сложно брать ответственность за свои деньги: «пусть кто-то другой решит»?",m:"отдаёшь ответственность за деньги другим"}];
+const qScore=i=>{const q=QS[i],a=S.qa[i];if(a==null)return 0;if(q.k==="one")return a;if(q.k==="multi")return Math.min(2,a.filter(x=>x!=="ok").length);const sv=v=>q.k==="ppopt"?(q.o.find(o=>o[0]===v)||[0,0,0])[2]:v;return Math.max(sv(a.mm)||0,sv(a.pp)||0)};
+const qMine=i=>{const q=QS[i],a=S.qa[i];if(q.k==="one")return q.m;if(q.k==="multi")return q.m.replace("{w}",a.filter(x=>x!=="ok").map(x=>q.g[x]).join(", "));if(q.k==="ppopt")return["mm","pp"].filter(k=>q.o.find(o=>o[0]===a[k])[2]>0).map(k=>"с "+NOUN[k].I+" "+q.ph[a[k]]).join("; ");const who=["mm","pp"].filter(k=>a[k]>0).map(k=>NOUN[k][q.c]);return q.m.replace("{w}",who.join(" и "))};
+const qDone=i=>{const q=QS[i],a=S.qa[i];if(a==null)return false;if(q.k==="one")return true;if(q.k==="multi")return a.length>0;return a.mm!=null&&a.pp!=null};
 const LIFEQ=[["kids","Дети",[["yes","Есть"],["no","Нет"]]],["prt","Партнёр",[["yes","Есть"],["no","Нет"],["hard","Всё сложно"]]],["mon","Деньги",[["ok","Хватает и растут"],["flow","Приходят и уходят"],["tight","Еле хватает"],["debt","Долги"]]],["rlz","Своё дело",[["joy","Есть и радует"],["hard","Есть, но тяжело"],["delay","Откладываю"],["lost","Не знаю, чем заниматься"]]]];
 const PLACE={
 o:{n:"Над родителями",t:"Ты встала выше мамы и папы",w:"Ты учишь, советуешь, спасаешь, решаешь за них. Ты стоишь не на месте их ребёнка, а на месте их родителя.",c:"Твои силы и твой взгляд уходят на родителей. Ты стоишь лицом к ним, а к своей жизни спиной.",pic:"Ты стоишь лицом к маме и папе, выше них. А твоя жизнь"},
@@ -235,10 +239,10 @@ if(me.post==="lie")add(M.post==="lie"?"slieM":"slie","mm");if(me.post==="wave")a
 if(me.gaze==="between")add("between");if(me.gaze==="far")add("sfar");if(bothWall)add("swall");
 const seen={},out=[];R.forEach(r=>{if(seen[r.id])return;seen[r.id]=1;const d=D[r.id];const f=s=>fill(s.replace("{post}",r.post||""),r.k);out.push({id:r.id,c:d.c,p:d.p,g:d.g,s:d.s,t:f(d.t),x:f(d.x),l:d.l.map(f),i:d.i?f(d.i):null})});
 return{bad:out.filter(o=>!o.g).sort((a,b)=>b.p-a.p),good:out.filter(o=>o.g)}}
-function place(){const sc={o:0,c:0,k:0};QS.forEach((q,i)=>{sc[q[0]]+=S.qa[i]||0});const{bad}=decode(),has=id=>bad.some(b=>b.id===id);
+function place(){const sc={o:0,c:0,k:0};QS.forEach((q,i)=>{sc[q.t]+=qScore(i)});const{bad}=decode(),has=id=>bad.some(b=>b.id===id);
 if(has("pfront"))sc.o+=3;if(has("small"))sc.o+=2;if(has("pity"))sc.o+=2;if(has("anger"))sc.c+=2;if(S.mm.feel.includes("hurt")||S.pp.feel.includes("hurt"))sc.c+=2;if(has("atme"))sc.c+=1;
 const so=Object.entries(sc).sort((a,b)=>b[1]-a[1]);const p=so[0][1]>=3?so[0][0]:"n",p2=p!=="n"&&so[1][1]>=3?so[1][0]:null;
-const mine=QS.map((q,i)=>[q,S.qa[i]]).filter(x=>x[1]>0&&(x[0][0]===p||x[0][0]===p2)).sort((a,b)=>b[1]-a[1]).map(x=>x[0][2]);return{p,p2,mine}}
+const mine=QS.map((q,i)=>[q,qScore(i),i]).filter(x=>x[1]>0&&(x[0].t===p||x[0].t===p2)).sort((a,b)=>b[1]-a[1]).map(x=>qMine(x[2]));return{p,p2,mine}}
 
 /* ----- шаги ----- */
 const STEPS=[intro,l1,room,()=>par("mm"),()=>par("pp"),self,life,lc,result];
@@ -263,11 +267,19 @@ function self(){const ok=S.me.post&&S.me.gaze;if(S.sub===1)return head(5)+`<h2>�
 return head(5)+`<div class="schw">${roomSVG()}</div><h2>А ты сама?</h2><div class="fig">Что ты делаешь?</div>`+chips(SPOST,S.me.post,"sk_post")+`<div class="fig">Куда ты смотришь?</div>`+chips(SGAZE,S.me.gaze,"sk_gaze")+`<button class="btn" ${ok?"":"disabled"} onclick="S.sub=1;render();vib([20,30,20]);chime(784,.1)">Посмотреть сверху</button>`}
 window.sk_post=v=>{S.me.post=v;vib();chime(700,.06);render()};window.sk_gaze=v=>{S.me.gaze=v;vib();chime(760,.06);render()};
 const ANS=[["Часто",2],["Иногда",1],["Нет",0]];
-function life(){if(S.qi<QS.length){const q=QS[S.qi],a=S.qa[S.qi];
-return head(6)+(S.qi===0?`<h2>А как ты живёшь на самом деле?</h2><p class="dim">В поле все умеют ставить «правильно». А жизнь показывает правду. Отвечай не как надо, а как бывает.</p>`:"")+`<span class="dim">вопрос ${S.qi+1} из ${QS.length}</span><div class="bar" style="margin:6px 0 14px">${QS.map((_,k)=>`<i class="${k<=S.qi?"on":""}"></i>`).join("")}</div><div class="box" style="font:700 20px/1.35 Georgia,serif">${q[1]}</div><div class="row">${ANS.map(([l,v])=>`<button class="opt chip ${a===v?"sel":""}" style="min-width:28%" ${a!=null?"disabled":""} onclick="ans(${v})">${l}</button>`).join("")}</div>${S.qi>0&&a==null?`<button class="btn ghost" onclick="S.qi--;S.qa.length=S.qi;render()">← Назад</button>`:""}`}
+function life(){if(S.qi<QS.length){const q=QS[S.qi],a=S.qa[S.qi];let body="";
+const rowP=(k,opts,cur)=>`<div class="fig">${NOUN[k].N}</div><div class="row">${opts.map(o=>`<button class="opt chip ${cur===o[1]||cur===o[0]?"sel":""}" style="min-width:28%" onclick="ansP('${k}','${o[0]}')">${o[1]}</button>`).join("")}</div>`;
+if(q.k==="one")body=`<div class="row">${ANS.map(([l,v])=>`<button class="opt chip ${a===v?"sel":""}" style="min-width:28%" ${a!=null?"disabled":""} onclick="ans(${v})">${l}</button>`).join("")}</div>`;
+else if(q.k==="pp"){const o=ANS.map(([l,v])=>[v,l]);body=`<p class="dim">Ответь отдельно про маму и про папу.</p>`+["mm","pp"].map(k=>`<div class="fig">${NOUN[k].N}</div><div class="row">${o.map(([v,l])=>`<button class="opt chip ${a&&a[k]===v?"sel":""}" style="min-width:28%" onclick="ansP('${k}',${v})">${l}</button>`).join("")}</div>`).join("")}
+else if(q.k==="ppopt")body=`<p class="dim">Ответь отдельно про маму и про папу.</p>`+["mm","pp"].map(k=>`<div class="fig">С ${NOUN[k].I}</div><div class="row">${q.o.map(([v,l])=>`<button class="opt chip ${a&&a[k]===v?"sel":""}" onclick="ansP('${k}','${v}')">${l}</button>`).join("")}</div>`).join("");
+else body=`<p class="dim">${q.h||""}</p><div class="row">${q.o.map(([v,l])=>`<button class="opt chip ${a&&a.includes(v)?"sel":""}" onclick="ansM('${v}')">${l}</button>`).join("")}</div>`;
+const nx=q.k!=="one"?`<button class="btn" ${qDone(S.qi)?"":"disabled"} onclick="S.qi++;render()">Дальше</button>`:"";
+return head(6)+(S.qi===0?`<h2>А как ты живёшь на самом деле?</h2><p class="dim">В поле все умеют ставить «правильно». А жизнь показывает правду. Отвечай не как надо, а как бывает.</p>`:"")+`<span class="dim">вопрос ${S.qi+1} из ${QS.length}</span><div class="bar" style="margin:6px 0 14px">${QS.map((_,k)=>`<i class="${k<=S.qi?"on":""}"></i>`).join("")}</div><div class="box" style="font:700 20px/1.35 Georgia,serif">${q.q}</div>`+body+nx+(S.qi>0?`<button class="btn ghost" onclick="S.qi--;S.qa.length=S.qi+1;S.qa[S.qi]=undefined;render()">← Назад</button>`:"")}
 const L=S.life,ok=LIFEQ.every(q=>L[q[0]]);return head(6)+`<h2>Что сейчас в твоей жизни?</h2><p class="dim">Из этого игра соберёт картину: как ты стоишь в жизни.</p>`+LIFEQ.map(([k,t,o])=>`<div class="fig">${t}${k==="mon"?" <span class=dim>(можно 2–3)</span>":""}</div>`+chips(o,L[k]||(k==="mon"?[]:null),"lk_"+k)).join("")+`<button class="btn" ${ok?"":"disabled"} onclick="go(7)">Дальше</button>`}
 LIFEQ.forEach(([k])=>window["lk_"+k]=v=>{if(k==="mon"){const m=Array.isArray(S.life.mon)?S.life.mon:[];const j=m.indexOf(v);j>-1?m.splice(j,1):m.length<3&&m.push(v);S.life.mon=m.length?m:undefined}else S.life[k]=v;render()});
-function ans(v){S.qa[S.qi]=v;render();RT.push(setTimeout(()=>{S.qi++;render()},280))}
+function ans(v){S.qa[S.qi]=v;vib();chime(640,.05);render();RT.push(setTimeout(()=>{S.qi++;render()},280))}
+function ansP(k,v){const a=S.qa[S.qi]||{};a[k]=v;S.qa[S.qi]=a;vib();chime(600+(k==="pp"?120:0),.05);render()}
+function ansM(v){let a=S.qa[S.qi]||[];if(v==="ok")a=a.includes("ok")?[]:["ok"];else{a=a.filter(x=>x!=="ok");const j=a.indexOf(v);j>-1?a.splice(j,1):a.push(v)}S.qa[S.qi]=a;vib();chime(680,.05);render()}
 function tg(k,i){const a=S[k],j=a.indexOf(i);j>-1?a.splice(j,1):a.push(i);vib();chime(720);render()}
 function lc(){return head(7)+`<h2>Сколько это уже стоит тебе?</h2><p class="dim">Подумай о своём запросе: «${esc(S.ask.trim())}». Честно, только для себя.</p><div class="fig">Как давно это с тобой?</div><div class="row">${YRS.map((y,i)=>`<button class="opt chip ${S.yrs===i?"sel":""}" onclick="S.yrs=${i};vib();chime(520);render()">${y}</button>`).join("")}</div><div class="fig">Чего тебе это уже стоило? Можно несколько.</div><div class="row">${COST.map((c,i)=>`<button class="opt chip ${S.cost.includes(i)?"sel":""}" onclick="tg('cost',${i})">${c}</button>`).join("")}</div><div class="fig">А сколько ещё ты собираешься так стоять?</div><div class="row">${MORE.map((m,i)=>`<button class="opt chip ${S.more===i?"sel":""}" onclick="S.more=${i};vib();chime(${i===3?880:440});render()">${m}</button>`).join("")}</div><div class="fig">Насколько ты хочешь, чтобы это изменилось?</div><div class="sl"><label><span class="dim">чуть-чуть</span><b id="rdv">${S.rd}</b><span class="dim">очень</span></label><input type="range" min="1" max="10" value="${S.rd}" oninput="S.rd=+this.value;document.getElementById('rdv').textContent=this.value"></div><button class="btn" ${S.yrs===null||!S.cost.length||S.more===null?"disabled":""} onclick="go(8)">Дальше</button>`}
 const PH1="Мама, папа, вы большие, а я маленькая. Я возвращаю вам ваши судьбы и беру свою жизнь.",PH2="Я принимаю от вас только жизнь. Это уже бесценный дар. Всё остальное я создам своими силами.";
@@ -285,6 +297,7 @@ function result(){const{text,bad,good,P,pl,lay}=summary();window._t=text;const c
 if(!S.rev)return `<span class="badge">ТВОЯ РАСШИФРОВКА</span><h2 style="text-align:center">Поле собрало твою картину</h2><p class="dim" style="text-align:center">Ты увидела маму и папу и честно рассказала, как живёшь. Осталось открыть, что это значит.</p><button class="reveal" onclick="S.rev=true;vib([40,60,40]);chime(587,.1);setTimeout(()=>chime(740,.1),200);setTimeout(()=>chime(880,.1),400);render()"><span>✦</span>Нажми, чтобы открыть<br>свою расшифровку</button>`;
 const top=bad.slice(0,2),mid=bad.slice(2,4),rest=bad.slice(4),off=P.p!=="n",sens=bad.find(f=>f.s);
 return `<div class="flip"><span class="badge">ТВОЁ ПОЛЕ</span><div class="schw big">${roomSVG()}</div></div>
+<div class="note">Если сейчас подступили слёзы — это нормально. Так душа узнаёт правду о себе. Сделай вдох и медленный выдох. Ты в безопасности.</div>
 ${top.length?`<h2>Что показало поле</h2>`+top.map((f,i)=>card(f,i===0)).join(""):`<div class="note">Твоё поле спокойное: мама и папа на своих местах.</div>`}
 ${mid.map(f=>`<div class="find"><h3>${esc(f.t)}</h3>${f.i?`<p class="inner">Внутри звучит: ${esc(f.i)}</p>`:""}<p class="dim" style="margin:0">🔒 Как это проявляется в твоей жизни и откуда это в роду — откроем на разборе.</p></div>`).join("")}
 ${good.map(f=>`<div class="note"><b>${esc(f.t)}.</b> ${esc(f.x)}</div>`).join("")}
