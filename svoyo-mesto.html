@@ -82,7 +82,7 @@ details summary{cursor:pointer;color:var(--gold);font-weight:700}
 </head>
 <body>
 <canvas id="bg" aria-hidden="true"></canvas>
-<button id="snd" onclick="sndToggle()" aria-label="Звук">🔇</button>
+<button id="snd" onclick="sndToggle()" aria-label="Звук">🔊</button>
 <div class="wrap"><div id="app"></div></div>
 <script>
 /* ===== ИГРА «СВОЁ МЕСТО» v6.2 — Диагностика жизни (методика Венеры Татиной) ===== */
@@ -359,6 +359,9 @@ const ea=q.a+1.3,ex=cx+Math.cos(ea)*r,ey=cy+Math.sin(ea)*r;x.beginPath();x.arc(e
 if(rm){for(let i=0;i<160;i++)step()}else{(function loop(){step();requestAnimationFrame(loop)})()}})();
 
 render();
+/* звук включён по умолчанию: пробуем сразу, а если браузер не дал — при первом касании экрана */
+try{audioStart()}catch(e){}
+["pointerdown","touchstart","keydown"].forEach(ev=>document.addEventListener(ev,function f(){if(AU.on&&AU.file&&AU.file.paused)AU.file.play().catch(()=>{});if(AU.on&&AU.ctx&&AU.ctx.state==="suspended")AU.ctx.resume();if(AU.v&&AU.vok&&AU.v.paused&&AU.v.currentTime===0&&AU.on)AU.v.play().catch(()=>{})},{once:false,passive:true}));
 </script>
 </body>
 </html>
