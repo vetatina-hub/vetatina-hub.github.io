@@ -5,56 +5,76 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Своё место — игра Венеры Татиной</title>
 <style>
-:root{--bg:#162545;--bg2:#1b3058;--box:#1a2d50;--bord:#2a4070;--gold:#c9a84c;--tx:#ddeeff;--dim:#a0bcd8;--red:#3a1a1a;--redl:#c0392b;--grn:#1e3820;--grnl:#3a7d44;--grnt:#a0e0a8;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-:root:not([data-theme="light"]){--bg:#162545}
-:root[data-theme="dark"]{--bg:#162545}
-html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+:root{--bg:#162545;--bg2:#1b3058;--box:#1a2d50;--bord:#2a4070;--gold:#c9a84c;--tx:#ddeeff;--dim:#a0bcd8;--red:#3a1a1a;--redl:#c0392b;--grn:#1e3820;--grnl:#3a7d44;--grnt:#a0e0a8;--vio:#a98cff;color-scheme:dark}
 *{box-sizing:border-box}
-body{margin:0;min-height:100%;background:var(--bg);color:var(--tx);font:17px/1.5 Calibri,Carlito,"Segoe UI",sans-serif}
-.wrap{max-width:560px;margin:0 auto;padding:22px 18px 40px;position:relative;z-index:1}
+html{height:100%}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--tx);font:17px/1.5 Calibri,Carlito,"Segoe UI",sans-serif;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.wrap{max-width:560px;margin:0 auto;padding:22px 16px 40px;position:relative;z-index:1}
 #bg{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
-#fld{position:relative;height:300px;border:1px dashed var(--gold);border-radius:6px;background:radial-gradient(circle at 50% 40%,#1b3058,#12203b);margin:0 0 10px;overflow:hidden;touch-action:none}
-.fg{position:absolute;width:62px;height:62px;cursor:grab;touch-action:none;user-select:none}
-.fg .arrw{position:absolute;inset:-9px;pointer-events:none}
-.fg .arrw:before{content:"";position:absolute;left:50%;top:0;margin-left:-7px;border:7px solid transparent;border-bottom:11px solid var(--gold);border-top:0}
-.fg .ci{position:absolute;inset:0;border-radius:50%;background:var(--gold);color:var(--bg);display:grid;place-items:center;font:700 13px Calibri,sans-serif;text-align:center;line-height:1.1;box-shadow:0 0 14px rgba(201,168,76,.35)}
-.fg.me .ci{background:#fff}
-.fg.on .ci{outline:3px solid var(--tx);outline-offset:2px}
-.rotb{display:flex;gap:10px;justify-content:center;margin:0 0 6px}.rotb button{width:54px;height:44px;font-size:22px;border-radius:50%;border:0;background:var(--gold);color:var(--bg);cursor:pointer}
-.wrap:before,.wrap:after{content:"";position:fixed;width:26px;height:26px;border:2px solid var(--gold);pointer-events:none;opacity:.8}
-.wrap:before{top:calc(10px + env(safe-area-inset-top,0px));left:10px;border-right:0;border-bottom:0}
-.wrap:after{bottom:calc(10px + env(safe-area-inset-bottom,0px));right:10px;border-left:0;border-top:0}
+#snd{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));right:14px;z-index:9;width:42px;height:42px;border-radius:50%;border:1px solid var(--gold);background:rgba(22,37,69,.85);color:var(--gold);font-size:19px;cursor:pointer}
 h1,h2{font-family:Georgia,"Times New Roman",serif;color:var(--gold);line-height:1.2;margin:0 0 12px}
-h1{font-size:34px;text-align:center}h2{font-size:25px}
+h1{font-size:34px;text-align:center}h2{font-size:24px}
 .badge{display:block;width:fit-content;margin:0 auto 18px;border:1px solid var(--gold);background:var(--bg2);color:var(--gold);padding:4px 14px;font-size:13px;font-weight:700;letter-spacing:.06em}
-.bar{display:flex;gap:5px;margin:0 0 20px}.bar i{flex:1;height:4px;background:var(--bord);border-radius:2px}.bar i.on{background:var(--gold)}
+.bar{display:flex;gap:5px;margin:0 0 16px}.bar i{flex:1;height:4px;background:var(--bord);border-radius:2px}.bar i.on{background:var(--gold)}
 .div{display:flex;align-items:center;gap:10px;color:var(--gold);margin:14px 0}.div:before,.div:after{content:"";flex:1;height:1px;background:var(--gold);opacity:.5}
 p{margin:0 0 12px}.dim{color:var(--dim)}
 .box{background:var(--box);border:1px solid var(--bord);border-left:5px solid var(--gold);padding:14px 16px;margin:0 0 12px}
-.opt{display:block;width:100%;text-align:left;background:var(--box);border:1px solid var(--bord);color:var(--tx);font:inherit;padding:13px 15px;margin:0 0 9px;cursor:pointer;border-radius:4px}
+.opt{display:block;width:100%;text-align:left;background:var(--box);border:1px solid var(--bord);color:var(--tx);font:inherit;padding:13px 15px;margin:0 0 9px;cursor:pointer;border-radius:6px;transition:transform .12s,border-color .2s}
+.opt:active{transform:scale(.98)}
 .opt:hover{border-color:var(--gold)}.opt.sel{border-color:var(--gold);background:var(--bg2);box-shadow:inset 4px 0 var(--gold)}
 .row{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}.chip{flex:1 1 auto;min-width:46%;text-align:center;margin:0}
-.btn{display:block;width:100%;background:var(--gold);color:var(--bg);border:0;font:700 18px Georgia,serif;padding:14px;margin-top:16px;cursor:pointer;border-radius:4px}
+.chip.add{min-width:30%;font-size:15px;padding:9px 8px;border-style:dashed}
+.btn{display:block;width:100%;background:var(--gold);color:var(--bg);border:0;font:700 18px Georgia,serif;padding:15px;margin-top:16px;cursor:pointer;border-radius:6px;text-decoration:none;text-align:center}
 .btn:disabled{opacity:.35;cursor:default}
 .btn.ghost{background:transparent;color:var(--gold);border:1px solid var(--gold)}
+.btn.glow{animation:glow 2.2s ease-in-out infinite}
+@keyframes glow{0%,100%{box-shadow:0 0 0 rgba(201,168,76,0)}50%{box-shadow:0 0 22px rgba(201,168,76,.55)}}
 button:focus-visible,input:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid var(--tx);outline-offset:2px}
-textarea{width:100%;background:var(--box);border:1px solid var(--bord);color:var(--tx);font:inherit;padding:12px;border-radius:4px;margin:0 0 12px}
-.note{background:var(--grn);border:1px solid var(--grnl);color:var(--grnt);padding:11px 14px;margin:6px 0 12px;border-radius:4px}
-.warn{background:var(--red);border:1px solid var(--redl);color:#f0a0a0;padding:11px 14px;margin:6px 0 12px;border-radius:4px}
+textarea{width:100%;background:var(--box);border:1px solid var(--bord);color:var(--tx);font:inherit;padding:12px;border-radius:6px;margin:0 0 12px}
+.note{background:var(--grn);border:1px solid var(--grnl);color:var(--grnt);padding:11px 14px;margin:6px 0 12px;border-radius:6px}
+.warn{background:var(--red);border:1px solid var(--redl);color:#f3b0a8;padding:11px 14px;margin:6px 0 12px;border-radius:6px}
 .fig{font-weight:700;color:var(--gold);margin:0 0 6px}
-.pos{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 16px}.pos .opt{margin:0;text-align:center;padding:10px 6px;font-size:15px}
-.sl{margin:0 0 18px}.sl label{display:flex;justify-content:space-between;margin-bottom:4px}.sl input{width:100%;accent-color:#c9a84c}
+.sl{margin:0 0 18px}.sl label{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}.sl b{font:700 26px Georgia,serif;color:var(--gold)}.sl input{width:100%;accent-color:#c9a84c}
+.vp{margin:0 0 14px}.vp button{display:flex;align-items:center;gap:10px;width:100%;background:linear-gradient(90deg,#2a2160,#1b3058);border:1px solid var(--vio);color:var(--tx);font:700 16px Calibri,sans-serif;padding:11px 14px;border-radius:30px;cursor:pointer}
+.vp i{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--vio);color:#1a1440;font-style:normal}
+.vp .wv{flex:1;height:14px;background:repeating-linear-gradient(90deg,rgba(169,140,255,.6) 0 3px,transparent 3px 7px);opacity:.5;border-radius:3px}
+.vp.play .wv{animation:wv 1s linear infinite;opacity:1}@keyframes wv{to{background-position:14px 0}}
+/* поле */
+#fld{position:relative;border:1px dashed var(--gold);border-radius:10px;background:radial-gradient(circle at 50% 40%,#1f3866,#101c36);margin:0 0 10px;overflow:hidden;touch-action:none}
+.fg{position:absolute;width:76px;height:96px;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;transition:filter .2s}
+.fg svg{display:block;width:36px;height:47px;margin:7px auto 0;filter:drop-shadow(0 0 8px rgba(201,168,76,.35))}
+.fg b{display:block;font:700 11px/1.05 Calibri,sans-serif;text-align:center;color:#fff;text-shadow:0 1px 3px #000;margin-top:12px}
+.gz{position:absolute;left:50%;top:30px;width:58px;height:58px;margin:-29px 0 0 -29px;border-radius:50%;border:1px dashed rgba(201,168,76,.4);pointer-events:none;transition:transform .25s}
+.gz:before{content:"";position:absolute;left:50%;top:-9px;margin-left:-7px;border:7px solid transparent;border-bottom:11px solid var(--gold);border-top:0}
+.fg.on .gz{border:2px solid #fff}.fg.on{filter:brightness(1.25)}
+.fg.pop svg{animation:pop .35s}@keyframes pop{50%{transform:scale(1.18)}}
+.rotb{display:flex;gap:10px;justify-content:center;margin:0 0 6px}.rotb button{min-width:54px;height:44px;font-size:20px;border-radius:24px;border:0;background:var(--gold);color:var(--bg);cursor:pointer;padding:0 12px}
+.hint{font-size:14px;text-align:center;color:var(--dim);margin:0 0 8px}
+/* выход */
 .hold{width:170px;height:170px;border-radius:50%;margin:20px auto;display:grid;place-items:center;font:700 18px Georgia,serif;color:var(--tx);border:0;cursor:pointer;touch-action:none;user-select:none;background:conic-gradient(var(--gold) 0deg,var(--bord) 0deg)}
 .hold span{background:var(--bg);width:146px;height:146px;border-radius:50%;display:grid;place-items:center;padding:10px}
-.phrase{font:italic 700 22px/1.4 Georgia,serif;color:var(--gold);margin:6px 0 14px;text-align:center}
-.res{font-size:16px;white-space:pre-wrap}
-@media (prefers-reduced-motion:no-preference){.fade{animation:f .35s ease}@keyframes f{from{opacity:0}to{opacity:1}}}
+.phrase{font:italic 700 21px/1.4 Georgia,serif;color:var(--gold);margin:6px 0 14px;text-align:center}
+/* финал */
+.reveal{display:grid;place-items:center;gap:10px;width:100%;min-height:260px;margin:10px 0;border:2px solid var(--gold);border-radius:14px;background:radial-gradient(circle,#2b2170,#162545);color:var(--tx);font:700 19px Georgia,serif;cursor:pointer;animation:glow 2s ease-in-out infinite}
+.reveal span{font-size:54px;color:var(--gold);animation:spin 6s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+.flip{animation:flip .7s ease}@keyframes flip{from{transform:rotateY(90deg);opacity:0}to{transform:none;opacity:1}}
+.lock{display:block;width:100%;text-align:left;background:#14213f;border:1px solid var(--vio);border-radius:8px;color:var(--tx);font:inherit;padding:13px 15px 13px 50px;margin:0 0 9px;cursor:pointer;position:relative}
+.lock:before{content:"🔒";position:absolute;left:15px;top:12px;font-size:20px}
+.lock small{display:none;color:var(--vio);margin-top:6px}.lock.open small{display:block}
+.lock.shake{animation:sh .4s}@keyframes sh{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.offer{border-left-color:var(--vio)}
+details summary{cursor:pointer;color:var(--gold);font-weight:700}
+.res{white-space:pre-wrap;font-size:15px}
+@media (prefers-reduced-motion:no-preference){.fade{animation:f .4s ease}@keyframes f{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}}
+@media (prefers-reduced-motion:reduce){.btn.glow,.reveal,.reveal span{animation:none}}
 </style>
 </head>
 <body>
 <canvas id="bg" aria-hidden="true"></canvas>
+<button id="snd" onclick="sndToggle()" aria-label="Звук">🔇</button>
 <div class="wrap"><div id="app"></div></div>
 <script>
+/* ===== ДАННЫЕ МЕТОДИКИ (без изменений из v3) ===== */
 const LOY={
 copy:{n:"Я как ты",need:"повторять твою судьбу",what:"Ты повторяешь путь мамы, папы или предка: так принадлежишь своему роду.",money:"Деньги идут по сценарию рода: сколько было у родителей, столько и удерживается.",rel:"Повторяются те же партнёры и те же истории, что были у мамы или папы.",body:"Те же болезни и те же возрасты, что в роду по линии мамы или бабушки.",ask:"Кто в роду был несчастлив в браке или жил так же, как ты сейчас?",ph:"Мама, я вижу твою судьбу. Я оставляю тебе твою судьбу. А свою жизнь я выбираю прожить по-другому."},
 instead:{n:"Я вместо тебя",need:"нести твою боль",what:"Ты берёшь на себя чужую судьбу и чужую боль: «я болею, чтобы ты могла жить».",money:"Силы и деньги уходят на чужие проблемы, на свою жизнь не остаётся.",rel:"Ты растворяешься в партнёре или семье и теряешь себя.",body:"Болезнь и усталость как способ нести чужое.",ask:"Чью боль или болезнь из рода ты несёшь вместо кого-то?",ph:"У тебя отдельная судьба. У меня отдельная судьба. Я остаюсь в своей жизни."},
@@ -103,7 +123,6 @@ const BANK={
 let SCENES=[];
 let SENT=[["У нас в роду деньги давались тяжело","down"],["Мама всю жизнь терпела и тянула","better"],["Хорошие девочки не высовываются","hide"],["Без труда не вытащишь рыбку","pain"],["Мне нельзя быть счастливее мамы","guilt"],["Я такая же, как мама или папа","copy"],["Деньги — это грех","relig"],["Мне хватит и малого","poor"]];
 const SENT0=SENT;const SENTA={"Отношения":[["Хорошие девочки терпят","pain"],["Мама терпела, и я буду","copy"],["Мне нельзя быть счастливее мамы","guilt"],["Или семья, или карьера","marr"],["Мужчина должен быть слабым, как папа","par"],["Я всё сама, мне никто не нужен","better"]],"Здоровье и тело":[["В нашем роду все болели","copy"],["Мне нельзя жить лучше, чем маме","down"],["Здоровье надо заслужить","pain"],["Хорошо жить — грех","relig"],["Мы умираем рано","excl"],["Лучше я, чем они","better"]],"Предназначение":[["Не высовывайся","hide"],["Лучше тихо, чтобы не завидовали","hide"],["Нельзя быть успешнее папы","par"],["Реализация — это эгоизм","relig"],["В нашем роду дело давалось тяжело","pain"],["Мне хватит и малого","poor"]],"Семья и род":[["О нём у нас не говорят","excl"],["Я такая же, как мама или папа","copy"],["Я должна всем помогать","better"],["У нас в роду жили небогато","down"],["Нельзя быть счастливее мамы","guilt"],["Я несу за них ответственность","instead"]],"Внутреннее состояние":[["Я всё должна сама","better"],["Мне нельзя радоваться","guilt"],["Бойся, всё отнимется","excl"],["Терпи, так надо","pain"],["Не высовывайся","hide"],["Я такая же, как мама","copy"]]};
-function setBank(){SCENES=BANK[S.area].map(q=>[S.area,q[0],q[1]]);SENT=SENTA[S.area]||SENT0;S.sc=[];S.sent=null}
 const EX=["Отец","Мама","Бывший партнёр","Тот, кто обидел","Тот, о ком в семье молчат"];
 const ROOT=["Мама","Папа","Бабушка","Дед","Не знаю"];
 const BODY=[["Горло","hide"],["Грудь","guilt"],["Живот","excl"],["Спина","better"],["Ноги","par"],["Нигде",null]];
@@ -115,90 +134,152 @@ const POSI=[
 {o:"Спорю и доказываю, что я права",n:"«Я докажу»",ph:"«Я уже знаю лучше»",what:"В трудный момент включается борьба: доказать, победить, не уступить.",money:"Силы уходят на соревнование, а не на рост.",rel:"Ссоры и споры там, где хочется близости.",out:"Спроси себя: «Мне важнее быть правой или быть счастливой?»"},
 {o:"Начинаю переделывать других: партнёра, детей, клиентов",n:"«Я всех изменю»",ph:"«Если они изменятся — мне станет хорошо»",what:"Ты стараешься исправить и спасти других, а на свою жизнь сил не остаётся.",money:"Вкладываешь время и деньги в чужие перемены.",rel:"Близкие сопротивляются, а ты устаёшь.",out:"Спроси себя: «Что я могу изменить в своей жизни сегодня?»"}];
 const POS=["За левым плечом","За правым плечом","Передо мной","Отвернулся(ась)"];
-const S={step:0,area:"Деньги",ask:"",pm:null,pp:null,sc:[],excl:[],roots:[],body:null,feel:null,sent:null,pos:null,fig:null,rqBack:false};
+
+/* ===== НОВОЕ v4: фигуры, цена, голос, музыка ===== */
+const AREAFIG={"Деньги":"Деньги","Отношения":"Партнёр","Здоровье и тело":"Моё тело","Предназначение":"Моё дело","Семья и род":"Моя семья","Внутреннее состояние":"Моя жизнь"};
+const AREAHIDE={"Деньги":"mon","Отношения":"prt","Предназначение":"rlz","Внутреннее состояние":"life"};
+// [подпись, цвет, силуэт: f — женский, m — мужской, n — нейтральный, знак на груди]
+const FIG={me:["Я","#ffffff","n",""],mm:["Мама","#e0b85a","f",""],pp:["Папа","#c9a84c","m",""],gm1:["Бабушка по маме","#d9c99a","f",""],gf1:["Дедушка по маме","#cdbb88","m",""],gm2:["Бабушка по папе","#d9c99a","f",""],gf2:["Дедушка по папе","#cdbb88","m",""],rq:["Запрос","#a98cff","n","◆"],mon:["Деньги","#5fd08a","n","₸"],prt:["Партнёр","#ff8fb1","n","♥"],rlz:["Реализация","#7fc8ff","n","★"],life:["Моя жизнь","#ffd36b","n","☀"]};
+const EXTRA=["gm1","gf1","gm2","gf2","mon","prt","rlz","life"];
+const SIL={n:"M8 50 Q8 23 20 23 Q32 23 32 50 Z",f:"M5 50 L13 27 Q20 21 27 27 L35 50 Z",m:"M8 50 V31 Q8 23 20 23 Q32 23 32 31 V50 Z"};
+const lab=k=>k==="rq"?AREAFIG[S.area]:FIG[k][0];
+const YRS=["Меньше года","1–3 года","3–5 лет","5–10 лет","Больше 10 лет","Сколько себя помню"];
+const YRT=["меньше года","уже 1–3 года","уже 3–5 лет","уже 5–10 лет","больше 10 лет","сколько ты себя помнишь"];
+const COST=["Денег","Отношений","Здоровья и сил","Времени","Радости","Мечты, которую отложила","Уверенности в себе"];
+const COSTT=["денег","отношений","здоровья и сил","времени","радости","мечты, которую ты отложила","уверенности в себе"];
+// Голосовые Венеры: положить mp3 в папку voice рядом с игрой. Нет файла — кнопка просто не появится.
+const VO={0:"voice/01_intro.mp3",2:"voice/02_pole.mp3",3:"voice/03_scenes.mp3",4:"voice/04_body.mp3",5:"voice/05_rod.mp3",7:"voice/06_cost.mp3",8:"voice/07_practice.mp3",9:"voice/08_field.mp3",10:"voice/09_invite.mp3"};
+
+const S={step:0,area:"Деньги",ask:"",pm:null,pp:null,sc:[],excl:[],roots:[],body:null,feel:null,sent:null,pos:null,fig:null,fig8:null,rqBack:false,yrs:null,cost:[],rd:7,dream:"",f8:[],rev:false,moved:0,sel:null};
 const $=document.getElementById("app");
-const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const TITLES=["Запрос","Поле","Сцены","Тело","Род","Фраза","Выход"];
-const head=i=>`<span class="badge">СВОЁ МЕСТО · УРОВЕНЬ ${i} ИЗ 7</span><div class="bar">${TITLES.map((_,k)=>`<i class="${k<i?"on":""}"></i>`).join("")}</div>`;
-function go(n){S.step=n;render();window.scrollTo(0,0)}
-function render(){const f=[intro,l1,l2,l3,l4,l5,l6,l7,l8,result][S.step];$.innerHTML=`<div class="fade">${f()}</div>`;if(S.step===7)bindHold();if(S.step===2)bindField();if(S.step===8)bindField("fig8")}
-function intro(){return `<span class="badge">К В А Н Т О В Ы Й   В З Л Ё Т</span><h1>Своё место</h1><div class="div">✦</div><p class="dim" style="text-align:center">Семь уровней, около 20 минут. Игра покажет, что на самом деле держит тебя в деньгах, отношениях и теле, и даст практику, чтобы вернуть чужое и взять своё.</p><div class="box">Отвечай не думая, первое, что откликнулось. Правильных ответов нет.</div><button class="btn" onclick="go(1)">Начать игру</button>`}
-function l1(){return head(1)+`<h2>С каким запросом ты пришла?</h2><p class="dim">Выбери сферу и назови запрос одной фразой.</p><div class="row">${AREAS.map(a=>`<button class="opt chip ${S.area===a?"sel":""}" onclick="S.area='${a}';render()">${a}</button>`).join("")}</div><textarea id="ask" rows="3" placeholder="Например: хочу получать деньги со своих разборов и курсов" oninput="S.ask=this.value;document.getElementById('b1').disabled=this.value.trim().length<5">${esc(S.ask)}</textarea><button id="b1" class="btn" ${S.ask.trim().length<5?"disabled":""} onclick="setBank();go(2)">Дальше</button>`}
-const posBlock=(w,k)=>`<div class="fig">${w}</div><div class="pos">${POS.map((p,i)=>`<button class="opt ${S[k]===i?"sel":""}" onclick="S.${k}=${i};render()">${p}</button>`).join("")}</div>`;
-function l2(){if(!S.fig)S.fig={me:{x:.14,y:.78,a:0},mm:{x:.38,y:.78,a:0},pp:{x:.62,y:.78,a:0},rq:{x:.86,y:.78,a:0}};S.moved=0;S.sel=null;const F=[["me","Я"],["mm","Мама"],["pp","Папа"],["rq","Мой запрос"]];return head(2)+`<h2>Расставь фигуры, как чувствуешь</h2><p class="dim">Четыре фигуры: ты, мама, папа и твой запрос. Не думай, ставь туда, куда тянет. Чтобы повернуть, выбери фигуру и нажми стрелку: жёлтый треугольник показывает, куда она смотрит.</p><div id="fld">${F.map(f=>`<div class="fg ${f[0]==='me'?'me':''}" id="f_${f[0]}" role="button" aria-label="${f[1]}"><div class="arrw"></div><div class="ci">${f[1]}</div></div>`).join("")}</div><div class="rotb"><button id="rl" aria-label="Повернуть влево">⟲</button><button id="rr" aria-label="Повернуть вправо">⟳</button></div><button class="btn" id="bf" disabled onclick="readField();go(3)">Считать поле</button>`}
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const TITLES=["Запрос","Поле","Сцены","Тело","Род","Фраза","Цена","Выход"];
+const head=i=>`<span class="badge">СВОЁ МЕСТО · УРОВЕНЬ ${i} ИЗ 8</span><div class="bar">${TITLES.map((_,k)=>`<i class="${k<i?"on":""}"></i>`).join("")}</div>`+VP;
+const VP=`<div class="vp" id="vp" hidden><button onclick="vToggle()"><i id="vpi">▶</i><span id="vpt">Голос Венеры</span><span class="wv"></span></button></div>`;
+const vib=n=>{try{navigator.vibrate&&navigator.vibrate(n||12)}catch(e){}};
+
+/* ----- звук ----- */
+const AU={ctx:null,on:false,duck:false,v:null,vs:-1,vok:false};
+const CH=[[110,164.8,220,329.6],[98,146.8,196,293.7],[87.3,130.8,174.6,261.6],[103.8,155.6,207.7,311.1],[110,130.8,164.8,220],[82.4,123.5,164.8,246.9],[73.4,110,146.8,220],[110,164.8,220,277.2]];
+function audioStart(){if(AU.ctx){AU.on=true;mvol();upd();return}try{const C=new(window.AudioContext||window.webkitAudioContext)();AU.ctx=C;const m=C.createGain();m.gain.value=0;const lp=C.createBiquadFilter();lp.type="lowpass";lp.frequency.value=650;lp.Q.value=.6;lp.connect(m);m.connect(C.destination);const lfo=C.createOscillator(),lg=C.createGain();lfo.frequency.value=.06;lg.gain.value=220;lfo.connect(lg);lg.connect(lp.frequency);lfo.start();
+AU.osc=[0,1,2,3].map(i=>{const o=C.createOscillator();o.type=i%2?"triangle":"sine";o.detune.value=(i-1.5)*5;const g=C.createGain();g.gain.value=i===0?.45:.2;o.connect(g);g.connect(lp);o.start();return o});AU.m=m;AU.on=true;chord(S.step);mvol();upd()}catch(e){}}
+function chord(n){if(!AU.ctx)return;const c=n>=10?CH[7]:CH[n%7],t=AU.ctx.currentTime;AU.osc.forEach((o,i)=>o.frequency.setTargetAtTime(c[i],t,1.2))}
+function mvol(){if(!AU.ctx)return;const t=AU.ctx.currentTime;AU.m.gain.cancelScheduledValues(t);AU.m.gain.setTargetAtTime(AU.on?(AU.duck?.025:.1):0,t,.7)}
+function chime(f,v){if(!AU.on||!AU.ctx)return;try{const C=AU.ctx,o=C.createOscillator(),g=C.createGain(),t=C.currentTime;o.type="sine";o.frequency.value=f||880;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(v||.09,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+1.5);o.connect(g);g.connect(C.destination);o.start(t);o.stop(t+1.6)}catch(e){}}
+function sndToggle(){if(!AU.ctx)audioStart();else{AU.on=!AU.on;mvol();if(!AU.on&&AU.v&&!AU.v.paused)AU.v.pause()}upd()}
+function upd(){document.getElementById("snd").textContent=AU.on?"🔊":"🔇"}
+function voiceFor(n){if(AU.vs!==n){if(AU.v){AU.v.pause()}AU.duck=false;mvol();AU.vs=n;AU.vok=false;AU.v=null;const src=VO[n];if(!src)return;const a=new Audio();a.preload="auto";a.oncanplaythrough=()=>{if(AU.v!==a||AU.vok)return;AU.vok=true;showVp();if(AU.on)a.play().then(()=>{AU.duck=true;mvol();vpState()}).catch(()=>{})};a.onended=a.onpause=()=>{AU.duck=false;mvol();vpState()};a.onplay=()=>{AU.duck=true;mvol();vpState()};a.src=src;AU.v=a}else if(AU.vok)showVp()}
+function showVp(){const e=document.getElementById("vp");if(e){e.hidden=false;vpState()}}
+function vpState(){const e=document.getElementById("vp");if(!e||!AU.v)return;const p=!AU.v.paused;e.classList.toggle("play",p);document.getElementById("vpi").textContent=p?"❚❚":"▶";document.getElementById("vpt").textContent=p?"Венера говорит…":(AU.v.currentTime>0?"Послушать Венеру ещё раз":"Голос Венеры")}
+function vToggle(){if(!AU.v)return;if(!AU.ctx)audioStart();if(AU.v.paused){if(AU.v.ended)AU.v.currentTime=0;AU.v.play().catch(()=>{})}else AU.v.pause()}
+
+/* ----- шаги ----- */
+const STEPS=[intro,l1,l2,l3,l4,l5,l6,lc,l7,l8,result];
+function go(n){S.step=n;render();window.scrollTo(0,0);chime(660,.05)}
+function render(){$.innerHTML=`<div class="fade">${STEPS[S.step]()}</div>`;if(S.step===2)bindField("fig");if(S.step===8)bindHold();if(S.step===9)bindField("fig8");voiceFor(S.step);chord(S.step)}
+function intro(){return `<span class="badge">К В А Н Т О В Ы Й   В З Л Ё Т</span><h1>Своё место</h1><div class="div">✦</div>${VP}<p class="dim" style="text-align:center">Восемь уровней, около 20 минут. Ты поставишь в поле себя, маму, папу и свой род, и увидишь, что на самом деле держит тебя в деньгах, отношениях и теле.</p><div class="box">🎧 Надень наушники и включи звук: в игре звучит музыка и голос Венеры.</div><div class="box dim">Отвечай не думая, первое, что откликнулось. Правильных ответов нет.</div><button class="btn glow" onclick="audioStart();go(1)">Начать игру</button>`}
+function l1(){return head(1)+`<h2>С каким запросом ты пришла?</h2><p class="dim">Выбери сферу и назови запрос одной фразой.</p><div class="row">${AREAS.map(a=>`<button class="opt chip ${S.area===a?"sel":""}" onclick="S.area='${a}';vib();chime(740);render()">${a}</button>`).join("")}</div><textarea id="ask" rows="3" placeholder="Например: хочу получать деньги со своих разборов и курсов" oninput="S.ask=this.value;document.getElementById('b1').disabled=this.value.trim().length<5">${esc(S.ask)}</textarea><button id="b1" class="btn" ${S.ask.trim().length<5?"disabled":""} onclick="setBank();go(2)">Дальше</button>`}
+function setBank(){SCENES=BANK[S.area].map(q=>[S.area,q[0],q[1]]);SENT=SENTA[S.area]||SENT0;S.sc=[];S.sent=null;S.fig=null;S.fig8=null}
+const rotb=`<div class="rotb"><button id="rl" aria-label="Повернуть влево">⟲</button><button id="r180" aria-label="Развернуть">↻ спиной</button><button id="rr" aria-label="Повернуть вправо">⟳</button></div>`;
+function figHTML(k){const f=FIG[k];return `<div class="fg" id="f_${k}" role="button" aria-label="${esc(lab(k))}"><div class="gz"></div><svg viewBox="0 0 40 52" aria-hidden="true"><circle cx="20" cy="11" r="8" fill="${f[1]}"/><path d="${SIL[f[2]]}" fill="${f[1]}"/>${f[3]?`<text x="20" y="43" text-anchor="middle" font-size="13" font-weight="700" fill="#162545">${f[3]}</text>`:""}</svg><b>${esc(lab(k))}</b></div>`}
+const field=(nm,h)=>`<div id="fld" style="height:${h}px">${Object.keys(S[nm]).map(figHTML).join("")}</div>`;
+function l2(){if(!S.fig){S.fig={me:{x:.13,y:.78,a:0},mm:{x:.38,y:.78,a:0},pp:{x:.62,y:.78,a:0},rq:{x:.87,y:.78,a:0}};S.moved=0}S.sel=null;return head(2)+`<h2>Поставь фигуры, как чувствуешь</h2><p class="dim">Ты, мама, папа и твоя сфера: <b style="color:#a98cff">«${AREAFIG[S.area]}»</b>. Не думай, тяни каждую туда, куда тянет рука. Потом выбери фигуру и поверни её: золотая стрелка показывает, куда она смотрит.</p>`+field("fig",330)+rotb+`<div id="live" class="box dim">Двигай фигуры, и поле начнёт откликаться.</div><button class="btn" id="bf" ${S.moved?"":"disabled"} onclick="readField();go(3)">Считать поле</button>`}
 function fieldNote(){const m=S.pm,p=S.pp;if(m===0&&p===1)return["g","Мама за левым плечом, папа за правым. Это эталон: за тобой род, и на него можно опереться."];const t=[];if(m===2||p===2)t.push("Родитель стоит перед тобой: часть тебя смотрит на него сверху вниз.");if(m===3||p===3)t.push("Родитель отвернулся: возможна обида или исключение, и его поток до тебя не доходит.");if(m===1||p===0)t.push("Места мамы и папы поменялись: это путаница ролей, она отражается на деньгах и мужчинах.");return["r",t.join(" ")||"Фигуры стоят не по эталону. Это не приговор, а точка для работы."]}
-function l3(){const n=S.sc.length,sc=SCENES[n];if(!sc)return go(4);return head(3)+`<span class="dim">Сфера: ${sc[0]} · сцена ${n+1} из ${SCENES.length}</span><h2>${esc(sc[1])}</h2>`+sc[2].map((a,i)=>`<button class="opt" onclick="pick(${i},this)">${esc(a[0])}</button>`).join("")}
-function pick(i,b){S.sc.push(i);b.classList.add("sel");setTimeout(()=>S.sc.length<SCENES.length?render():go(4),230)}
-function l4(){const[t,x0]=fieldNote();const x=x0+(S.rqBack?" Ты стоишь спиной к своему запросу: часть тебя не готова на него смотреть.":"");
-return head(4)+`<div class="${t==="g"?"note":"warn"}">${x}</div><h2>Тело знает раньше ума</h2><p class="dim">Подумай про свою сферу и про то, чего ты хочешь: ${S.area.toLowerCase()}. Первая реакция честнее всего.</p><div class="fig">Где в теле откликается?</div><div class="row">${BODY.map((b,i)=>`<button class="opt chip ${S.body===i?"sel":""}" onclick="S.body=${i};render()">${b[0]}</button>`).join("")}</div><div class="fig">Что ты чувствуешь, когда тебе по-настоящему хорошо?</div>${FEEL.map((b,i)=>`<button class="opt ${S.feel===i?"sel":""}" onclick="S.feel=${i};render()">${b[0]}</button>`).join("")}<button class="btn" ${S.body===null||S.feel===null?"disabled":""} onclick="go(5)">Дальше</button>`}
-function tg(k,i){const a=S[k],j=a.indexOf(i);j>-1?a.splice(j,1):a.push(i);render()}
+function liveNote(){if(S.step!==2)return;readField();const[t,x]=fieldNote(),e=document.getElementById("live");if(!e)return;e.className=t==="g"?"note":"warn";e.textContent=x+(S.rqBack?` Ты стоишь спиной к фигуре «${AREAFIG[S.area]}».`:"");e.classList.add("fade")}
+function l3(){const n=S.sc.length,sc=SCENES[n];return head(3)+`<span class="dim">Сфера: ${sc[0]} · сцена ${n+1} из ${SCENES.length}</span><h2>${esc(sc[1])}</h2>`+sc[2].map((a,i)=>`<button class="opt" onclick="pick(${i},this)">${esc(a[0])}</button>`).join("")}
+function pick(i,b){S.sc.push(i);b.classList.add("sel");vib();chime(587+S.sc.length*110);setTimeout(()=>S.sc.length<SCENES.length?render():go(4),260)}
+function l4(){const[t,x0]=fieldNote();const x=x0+(S.rqBack?` Ты стоишь спиной к фигуре «${AREAFIG[S.area]}»: часть тебя не готова на неё смотреть.`:"");
+return head(4)+`<div class="${t==="g"?"note":"warn"}">${x}</div><h2>Тело знает раньше ума</h2><p class="dim">Подумай про свою сферу и про то, чего ты хочешь: ${S.area.toLowerCase()}. Первая реакция честнее всего.</p><div class="fig">Где в теле откликается?</div><div class="row">${BODY.map((b,i)=>`<button class="opt chip ${S.body===i?"sel":""}" onclick="S.body=${i};vib();chime(700);render()">${b[0]}</button>`).join("")}</div><div class="fig">Что ты чувствуешь, когда тебе по-настоящему хорошо?</div>${FEEL.map((b,i)=>`<button class="opt ${S.feel===i?"sel":""}" onclick="S.feel=${i};vib();chime(780);render()">${b[0]}</button>`).join("")}<button class="btn" ${S.body===null||S.feel===null?"disabled":""} onclick="go(5)">Дальше</button>`}
+function tg(k,i){const a=S[k],j=a.indexOf(i);j>-1?a.splice(j,1):a.push(i);vib();chime(720);render()}
 function l5(){return head(5)+`<h2>Что в роду?</h2><p class="dim">Кто в роду жил похожим образом: так же с деньгами, в браке, со здоровьем?</p><div class="row">${ROOT.map((e,i)=>`<button class="opt chip ${S.roots.includes(i)?"sel":""}" onclick="tg('roots',${i})">${e}</button>`).join("")}</div><div class="fig">Кого ты исключила: из жизни, из разговоров, из сердца?</div>`+EX.map((e,i)=>`<button class="opt ${S.excl.includes(i)?"sel":""}" onclick="tg('excl',${i})">${e}</button>`).join("")+`<div class="box dim">Кого исключаем, того притягиваем. Отмечай, что откликнулось, можно никого.</div><button class="btn" onclick="go(6)">Дальше</button>`}
-function l6(){return head(6)+`<h2>Какая фраза из семьи звучит в тебе?</h2><p class="dim">Выбери одну, самую знакомую.</p>`+SENT.map((s,i)=>`<button class="opt ${S.sent===i?"sel":""}" onclick="S.sent=${i};render()">«${s[0]}»</button>`).join("")+`<div class="div">✦</div><div class="fig">Когда становится трудно, что ты чаще всего делаешь?</div>`+POSI.map((p,i)=>`<button class="opt ${S.pos===i?"sel":""}" onclick="S.pos=${i};render()">${p.o}</button>`).join("")+`<button class="btn" ${S.sent===null||S.pos===null?"disabled":""} onclick="go(7)">Дальше</button>`}
+function l6(){return head(6)+`<h2>Какая фраза из семьи звучит в тебе?</h2><p class="dim">Выбери одну, самую знакомую.</p>`+SENT.map((s,i)=>`<button class="opt ${S.sent===i?"sel":""}" onclick="S.sent=${i};vib();chime(700);render()">«${s[0]}»</button>`).join("")+`<div class="div">✦</div><div class="fig">Когда становится трудно, что ты чаще всего делаешь?</div>`+POSI.map((p,i)=>`<button class="opt ${S.pos===i?"sel":""}" onclick="S.pos=${i};vib();chime(760);render()">${p.o}</button>`).join("")+`<button class="btn" ${S.sent===null||S.pos===null?"disabled":""} onclick="go(7)">Дальше</button>`}
+function lc(){return head(7)+`<h2>Сколько это уже стоит тебе?</h2><p class="dim">Честно, только для себя. Никто, кроме тебя, этого не увидит.</p><div class="fig">Как давно это с тобой?</div><div class="row">${YRS.map((y,i)=>`<button class="opt chip ${S.yrs===i?"sel":""}" onclick="S.yrs=${i};vib();chime(520);render()">${y}</button>`).join("")}</div><div class="fig">Чего тебе это уже стоило? Можно несколько.</div><div class="row">${COST.map((c,i)=>`<button class="opt chip ${S.cost.includes(i)?"sel":""}" onclick="tg('cost',${i})">${c}</button>`).join("")}</div><div class="fig">Насколько ты хочешь, чтобы это изменилось?</div><div class="sl"><label><span class="dim">чуть-чуть</span><b id="rdv">${S.rd}</b><span class="dim">очень</span></label><input type="range" min="1" max="10" value="${S.rd}" oninput="S.rd=+this.value;document.getElementById('rdv').textContent=this.value"></div><div class="fig">Представь, что это ушло. Что изменится первым?</div><textarea rows="2" placeholder="Например: я спокойно называю свою цену" oninput="S.dream=this.value">${esc(S.dream)}</textarea><button class="btn" ${S.yrs===null||!S.cost.length?"disabled":""} onclick="go(8)">Дальше</button>`}
 function calc(){const L={};Object.keys(LOY).forEach(k=>L[k]=0);const sph={};
 S.sc.forEach((i,n)=>{L[SCENES[n][2][i][1]]+=2});
 const add=(k,w)=>{if(k)L[k]+=w};add(BODY[S.body][1],2);add(FEEL[S.feel][1],2);add(SENT[S.sent][1],3);add("excl",Math.min(2,S.excl.length));
 const so=Object.entries(L).sort((a,b)=>b[1]-a[1]);const lk=so[0][0],lk2=so[1][1]>=4?so[1][0]:null;
 S.sc.forEach((i,n)=>{if(SCENES[n][2][i][1]===lk){const a=SCENES[n][0];sph[a]=(sph[a]||0)+1}});
 const sp=Object.keys(sph).length?Object.entries(sph).sort((a,b)=>b[1]-a[1])[0][0]:S.area;return{lk,lk2,sp}}
-function l7(){const{lk}=calc(),L=LOY[lk];return head(7)+`<h2>Выход: вернуть чужое маме или папе</h2><p class="dim">Закрой глаза, вдохни и выдохни. Представь большое белое пространство, перед тобой мама или папа. Скажи вслух:</p><div class="box">«Для того чтобы тебе принадлежать, мне нужно было ${L.need}. Теперь я понимаю: это не моё, это то, что я увидела у тебя. Я возвращаю тебе это.»</div><p class="dim">Теперь удерживай круг: из тебя выходит белый шар, и ты отдаёшь его в руки. Мама или папа с этим справится.</p><button class="hold" id="hold"><span>Отдаю шар</span></button><div class="phrase">«${L.ph}»</div><button class="btn" id="b7" disabled onclick="go(8)">Моё заключение</button>`}
-function bindHold(){const h=document.getElementById("hold");let t=null,s=0;const done=()=>{h.style.background="conic-gradient(var(--gold) 360deg,var(--bord) 360deg)";h.firstChild.textContent="Готово";document.getElementById("b7").disabled=false};
+function l7(){const{lk}=calc(),L=LOY[lk];return head(8)+`<h2>Выход: вернуть чужое маме или папе</h2><p class="dim">Закрой глаза, вдохни и выдохни. Представь большое белое пространство, перед тобой мама или папа. Скажи вслух:</p><div class="box">«Для того чтобы тебе принадлежать, мне нужно было ${L.need}. Теперь я понимаю: это не моё, это то, что я увидела у тебя. Я возвращаю тебе это.»</div><p class="dim">Теперь нажми и держи круг: из тебя выходит белый шар, и ты отдаёшь его в руки. Мама или папа с этим справится.</p><button class="hold" id="hold"><span>Держи и отдавай шар</span></button><div class="phrase">«${L.ph}»</div><button class="btn" id="b7" disabled onclick="go(9)">Финал: посмотреть на свою жизнь</button>`}
+function bindHold(){const h=document.getElementById("hold");let t=null,s=0,last=0;const done=()=>{h.style.background="conic-gradient(var(--gold) 360deg,var(--bord) 360deg)";h.firstChild.textContent="Отдала ✦";document.getElementById("b7").disabled=false;vib([30,40,60]);chime(523,.12);setTimeout(()=>chime(659,.1),180);setTimeout(()=>chime(784,.1),360)};
 const stop=()=>{clearInterval(t);if(s<1){s=0;h.style.background="conic-gradient(var(--gold) 0deg,var(--bord) 0deg)"}};
-h.addEventListener("pointerdown",e=>{e.preventDefault();if(s>=1)return;const t0=Date.now();t=setInterval(()=>{s=Math.min(1,(Date.now()-t0)/2500);h.style.background=`conic-gradient(var(--gold) ${s*360}deg,var(--bord) ${s*360}deg)`;if(s>=1){clearInterval(t);done()}},30)});
+h.addEventListener("pointerdown",e=>{e.preventDefault();if(s>=1)return;const t0=Date.now();t=setInterval(()=>{s=Math.min(1,(Date.now()-t0)/3000);h.style.background=`conic-gradient(var(--gold) ${s*360}deg,var(--bord) ${s*360}deg)`;const q=Math.floor(s*6);if(q>last){last=q;vib(8)}if(s>=1){clearInterval(t);done()}},30)});
 ["pointerup","pointerleave","pointercancel"].forEach(ev=>h.addEventListener(ev,stop));
 h.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){s=1;done()}})}
+
+/* ----- финальное поле ----- */
+const IDEAL={me:{x:.5,y:.46,a:0},rq:{x:.5,y:.1,a:180},mon:{x:.18,y:.17,a:180},rlz:{x:.82,y:.17,a:180},life:{x:.5,y:.26,a:180},prt:{x:.74,y:.46,a:0},mm:{x:.36,y:.63,a:0},pp:{x:.64,y:.63,a:0},gm1:{x:.12,y:.8,a:0},gf1:{x:.34,y:.8,a:0},gm2:{x:.66,y:.8,a:0},gf2:{x:.88,y:.8,a:0}};
+const ESC={me:{x:.5,y:.56,a:0},rq:{x:.5,y:.8,a:0},mon:{x:.2,y:.8,a:0},rlz:{x:.8,y:.8,a:0},life:{x:.32,y:.7,a:0},prt:{x:.88,y:.56,a:90},mm:{x:.38,y:.32,a:180},pp:{x:.62,y:.32,a:180},gm1:{x:.12,y:.12,a:180},gf1:{x:.37,y:.12,a:180},gm2:{x:.63,y:.12,a:180},gf2:{x:.88,y:.12,a:180}};
+function l8(){if(!S.fig8){S.fig8={gm1:{x:.12,y:.42,a:0},gf1:{x:.37,y:.42,a:0},gm2:{x:.63,y:.42,a:0},gf2:{x:.88,y:.42,a:0},me:{x:.12,y:.78,a:0},mm:{x:.37,y:.78,a:0},pp:{x:.63,y:.78,a:0},rq:{x:.88,y:.78,a:0}};S.moved=0}S.sel=null;const hid=AREAHIDE[S.area],ex=EXTRA.filter(k=>!(k in S.fig8)&&k!==hid);
+return `<span class="badge">ФИНАЛ · ВЗГЛЯД НА СВОЮ ЖИЗНЬ</span>${VP}<h2>Где стоит твоя жизнь?</h2><p class="dim">Это всё твоё поле. Поставь всех, как чувствуешь: кто за спиной, кто перед глазами, кто отвернулся. Добавь, кто ещё важен.</p>${ex.length?`<div class="row">${ex.map(k=>`<button class="opt chip add" onclick="addFig('${k}')">+ ${FIG[k][0]}</button>`).join("")}</div>`:""}`+field("fig8",440)+rotb+`<button class="btn" id="bf" ${S.moved?"":"disabled"} onclick="read8()">Считать поле</button><div id="an8"></div><div id="demo8" style="display:none"><div id="demob"><div class="box" id="cap8">Нажми, чтобы увидеть, как это бывает в жизни.</div><button class="btn ghost" onclick="anim(ESC);cap('Мы разворачиваемся к претензиям: к родителям, бабушкам и дедушкам. Любим их учить и убегаем на чужие места. Тогда мы стоим спиной к своей жизни: к деньгам, партнёру, своему делу.')">Покажи, как мы убегаем</button><button class="btn ghost" onclick="anim(IDEAL);cap('Чтобы идти в жизнь, мы смотрим вперёд: на свой запрос, деньги, дело. Партнёр рядом. Род стоит сзади и передаёт силу через плечи. Это и значит занять своё место.')">Покажи, как это работает</button></div><div class="box" style="border-left-color:#a98cff">Это только первый взгляд. Твоё заключение уже собрано.</div><button class="btn glow" onclick="go(10)">Открыть моё заключение</button></div>`}
+function addFig(k){const used=Object.values(S.fig8);let p={x:.5,y:.2};for(let i=0;i<30;i++){const c={x:.1+Math.random()*.8,y:.12+Math.random()*.66};if(used.every(u=>Math.hypot(u.x-c.x,u.y-c.y)>.17)){p=c;break}}S.fig8[k]={x:p.x,y:p.y,a:0};S.moved=1;vib(20);chime(880);render();const el=document.getElementById("f_"+k);if(el)el.classList.add("pop")}
+function cap(t){document.getElementById("cap8").textContent=t;chime(600)}
+function anim(T){const F=S.fig8,ks=Object.keys(F).filter(k=>T[k]),from={};ks.forEach(k=>from[k]={...F[k]});const t0=performance.now();(function f(n){const p=Math.min(1,(n-t0)/1500),e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;ks.forEach(k=>{const a=F[k],b=from[k],c=T[k];a.x=b.x+(c.x-b.x)*e;a.y=b.y+(c.y-b.y)*e;a.a=b.a+nrm(c.a-b.a)*e;window._pl&&window._pl(k)});if(p<1)requestAnimationFrame(f)})(t0)}
+function read8(){const f=document.getElementById("fld"),W=f.clientWidth,H=f.clientHeight,F=S.fig8,me=F.me;const ang=(a,b)=>Math.atan2((b.x-a.x)*W,-(b.y-a.y)*H)*180/Math.PI,rel=o=>nrm(ang(me,o)-me.a);const has=k=>k in F;
+const A=["mm","pp","gm1","gf1","gm2","gf2"].filter(has),LIFE=["rq","mon","rlz","life"].filter(has);
+const ahead=A.filter(k=>Math.abs(rel(F[k]))<60),away=A.concat(has("prt")?["prt"]:[]).filter(k=>Math.abs(nrm(F[k].a-ang(F[k],me)))>110),back=LIFE.filter(k=>Math.abs(rel(F[k]))>=120),front=LIFE.filter(k=>Math.abs(rel(F[k]))<60),t=[];
+if(front.length&&!ahead.length)t.push(["g",`Твой взгляд на том, что важно: ${front.map(lab).join(", ")}. А род за спиной. Это порядок: сила рода идёт тебе в спину.`]);
+if(back.length)t.push(["r",`За твоей спиной: ${back.map(lab).join(", ")}. Ты стоишь к этому спиной и смотришь не в свою жизнь.`]);
+if(ahead.length)t.push(["r",`Перед тобой стоят: ${ahead.map(lab).join(", ")}. Твой взгляд занят ими: претензии, желание учить и спасать.`]);
+if(away.length)t.push(["r",`Отвернулись от тебя: ${away.map(lab).join(", ")}. Поток силы до тебя не доходит.`]);
+if(has("prt")&&Math.hypot((F.prt.x-me.x)*W,(F.prt.y-me.y)*H)>W*.55)t.push(["r","Партнёр стоит далеко от тебя: между вами много пространства."]);
+if(!t.length)t.push(["r","Картина неоднозначная. Посмотри сердцем: кто стоит ближе всех к тебе, а кто за спиной?"]);
+S.f8=t;document.getElementById("an8").innerHTML=t.map(x=>`<div class="${x[0]==="g"?"note":"warn"} fade">${x[1]}</div>`).join("");vib([20,30,20]);chime(t.length===1&&t[0][0]==="g"?880:392,.1);
+document.getElementById("demo8").style.display="block";const good=t.length===1&&t[0][0]==="g";document.getElementById("demob").style.display=good?"none":"block";document.getElementById("an8").scrollIntoView({behavior:"smooth"})}
+
+/* ----- заключение ----- */
 function summary(){const{lk,lk2,sp}=calc(),L=LOY[lk],ex=S.excl.map(i=>EX[i]).join(", "),rt=S.roots.map(i=>ROOT[i]).join(", ");
-const text=`ЧТО ТЕБЯ ДЕРЖИТ: «${L.n}»\n${L.what}${lk2?`\nРядом звучит ещё: «${LOY[lk2].n}».`:""}\n\nЗапрос: ${S.ask.trim()} (${S.area})\nСильнее всего это звучит в сфере: ${sp}\n\nКАК ЭТО ПРОЯВЛЯЕТСЯ\nДеньги: ${L.money}\nОтношения: ${L.rel}\nТело: ${L.body}\n\nПОЛЕ: ${fieldNote()[1]}${S.rqBack?" Ты стоишь спиной к своему запросу.":""}\n${rt?"В роду жили похоже: "+rt+"\n":""}${ex?"Исключённые: "+ex+"\n":""}${S.pos!==null?`\nКАК ТЫ ДЕЙСТВУЕШЬ, КОГДА ТРУДНО: ${POSI[S.pos].n}\nВнутри звучит: ${POSI[S.pos].ph}\n${POSI[S.pos].what}\nДеньги: ${POSI[S.pos].money}\nОтношения: ${POSI[S.pos].rel}\n${POSI[S.pos].out}\n`:""}\nВОПРОС ДЛЯ РАЗБОРА\n${L.ask}\n\nПРАКТИКА «ВЕРНУТЬ ЧУЖОЕ МАМЕ ИЛИ ПАПЕ»\n1. Закрой глаза, вдохни и выдохни, расслабь тело. Представь большое белое пространство.\n2. Перед тобой мама или папа. Скажи: «Для того чтобы тебе принадлежать, мне нужно было ${L.need}. Теперь я понимаю: это не моё. Я возвращаю тебе это.»\n3. Представь, как из тебя выходит белый шар, и ты отдаёшь его в руки. «Я знаю, ты с этим справишься.»\n4. Скажи: «Спасибо за жизнь. Теперь я могу чувствовать свои чувства.»\n5. Три дня подряд повторяй утром: «${L.ph}»`;return{text,L}}
-function result(){const{text,L}=summary();window._t=text;const code=calc().lk+"_"+AREAS.indexOf(S.area)+(S.pos!==null?"_p"+S.pos:"");return `<span class="badge">ТВОЁ ЗАКЛЮЧЕНИЕ</span><h1>${L.n}</h1><div class="div">✦</div><div class="box res">${esc(text)}</div>
-<div class="box" style="border-left-color:#a98cff"><h2 style="font-size:22px">Ты увидела только верхний слой</h2><p>Игра показала, что тебя держит. Но она не знает, чья это история в твоём роду и как вернуть её на место. Это видно только в поле, на разборе.</p><p class="fig">Что произойдёт на разборе</p><p>— Мы посмотрим твой вопрос: «${esc(L.ask)}»<br>— Поставим тебя, родителей и предков в поле и увидим, кто стоит не на своём месте.<br>— Ты услышишь точные слова для своей сферы («${esc(S.area)}») и почувствуешь сдвиг сразу.</p><p class="dim">Личный разбор с Венерой: один запрос, около 2 часов, 35 000 тг. Нажми кнопку: помощник уже будет знать твою программу и сферу.</p></div>
-<a class="btn" style="text-decoration:none;text-align:center" href="https://t.me/akademiya_kvant_bot?start=${code}" target="_blank" rel="noopener">Записаться на разбор</a>
-<a class="btn ghost" style="text-decoration:none;text-align:center;display:block" href="https://t.me/+2v5c8znsaONjY2Fi" target="_blank" rel="noopener">Пока просто посмотреть: прийти фигурой бесплатно</a>
-<button class="btn ghost" onclick="cp(this)">Скопировать заключение, чтобы взять с собой</button>
+const text=`ЧТО ТЕБЯ ДЕРЖИТ: «${L.n}»\n${L.what}${lk2?`\nРядом звучит ещё: «${LOY[lk2].n}».`:""}\n\nЗапрос: ${S.ask.trim()} (${S.area})\nСильнее всего это звучит в сфере: ${sp}\n\nКАК ЭТО ПРОЯВЛЯЕТСЯ\nДеньги: ${L.money}\nОтношения: ${L.rel}\nТело: ${L.body}\n\nПОЛЕ: ${fieldNote()[1]}${S.rqBack?" Ты стоишь спиной к своему запросу.":""}\n${S.f8.map(x=>x[1]).join("\n")}\n${rt?"В роду жили похоже: "+rt+"\n":""}${ex?"Исключённые: "+ex+"\n":""}${S.yrs!==null?`\nЭто с тобой ${YRT[S.yrs]}. Уже стоило: ${S.cost.map(i=>COSTT[i]).join(", ")}.\n`:""}${S.dream.trim()?`Когда это уйдёт: ${S.dream.trim()}\n`:""}${S.pos!==null?`\nКАК ТЫ ДЕЙСТВУЕШЬ, КОГДА ТРУДНО: ${POSI[S.pos].n}\nВнутри звучит: ${POSI[S.pos].ph}\n${POSI[S.pos].what}\n${POSI[S.pos].out}\n`:""}\nВОПРОС ДЛЯ РАЗБОРА\n${L.ask}\n\nПРАКТИКА «ВЕРНУТЬ ЧУЖОЕ МАМЕ ИЛИ ПАПЕ»\n1. Закрой глаза, вдохни и выдохни, расслабь тело. Представь большое белое пространство.\n2. Перед тобой мама или папа. Скажи: «Для того чтобы тебе принадлежать, мне нужно было ${L.need}. Теперь я понимаю: это не моё. Я возвращаю тебе это.»\n3. Представь, как из тебя выходит белый шар, и ты отдаёшь его в руки. «Я знаю, ты с этим справишься.»\n4. Скажи: «Спасибо за жизнь. Теперь я могу чувствовать свои чувства.»\n5. Три дня подряд повторяй утром: «${L.ph}»`;return{text,L,lk2}}
+function result(){const{text,L,lk2}=summary();window._t=text;const code=calc().lk+"_"+AREAS.indexOf(S.area)+(S.pos!==null?"_p"+S.pos:"");
+if(!S.rev)return `<span class="badge">ТВОЁ ЗАКЛЮЧЕНИЕ</span><h2 style="text-align:center">Поле собрало твою картину</h2><p class="dim" style="text-align:center">Восемь уровней позади. Осталось открыть, что держит тебя.</p><button class="reveal" onclick="S.rev=true;vib([40,60,40]);chime(523,.12);setTimeout(()=>chime(784,.12),200);setTimeout(()=>chime(1047,.1),400);render()"><span>✦</span>Нажми, чтобы открыть<br>свою программу</button>`;
+const f8=S.f8.find(x=>x[0]==="r"),dream=S.dream.trim(),costs=S.cost.map(i=>COSTT[i]).join(", ");
+return `<div class="flip"><span class="badge">ТВОЯ ПРОГРАММА</span><h1>${L.n}</h1><div class="phrase" style="font-size:18px">${esc(L.what)}</div></div>${lk2?`<p class="dim" style="text-align:center">Рядом звучит ещё: «${LOY[lk2].n}»</p>`:""}
+<div class="box"><div class="fig">Твоё зеркало</div><p>Ты пришла с запросом: «${esc(S.ask.trim())}».</p><p>В поле: ${fieldNote()[1]}${f8?" "+f8[1]:""}</p><p>В тебе звучит: «${esc(SENT[S.sent][0])}».</p><p style="margin:0">Когда трудно: ${POSI[S.pos].n}. ${POSI[S.pos].what}</p></div>
+<div class="box"><div class="fig">Как это проявляется</div><p>💰 ${L.money}</p><p>❤ ${L.rel}</p><p style="margin:0">🌿 ${L.body}</p></div>
+<div class="warn">Это с тобой ${YRT[S.yrs]}. И это уже стоило тебе ${costs}. Такие программы не про силу воли: пока не видно, чья это история, сценарий обычно повторяется снова.</div>
+${dream?`<div class="note">Ты написала, что первым изменится: «${esc(dream)}». Это и есть твой запрос на разбор.</div>`:""}
+<div class="div">✦</div><h2>Три ключа ещё закрыты</h2><p class="dim">Игра показала, ЧТО тебя держит. Но не ЧЬЯ это история и как вернуть её на место. Нажми на ключ.</p>
+<button class="lock" onclick="unlock(this)"><b>Чья это история в твоём роду</b><small>${esc(L.ask)} Это видно только в поле, на разборе с Венерой.</small></button>
+<button class="lock" onclick="unlock(this)"><b>Кто в твоём поле стоит не на своём месте</b><small>Игра увидела расположение фигур. Кто именно держит и почему, Венера увидит в поле на разборе.</small></button>
+<button class="lock" onclick="unlock(this)"><b>Какие слова вернут тебе силу в сфере «${esc(S.area)}»</b><small>Точные слова подбираются в поле под твою историю, а не под шаблон. Их ты услышишь на разборе.</small></button>
+${VP}
+<div class="box offer"><div class="fig" style="color:#a98cff">Личный разбор с Венерой</div><p>Мы возьмём твой запрос «${esc(S.ask.trim())}», поставим в поле тебя, родителей и род и увидим, кто стоит не на своём месте. Ты услышишь слова, которые вернут чужое и откроют твоё.</p>${S.rd>=7?`<p>Ты сказала, что хочешь перемен на <b>${S.rd} из 10</b>. Значит, время посмотреть глубже.</p>`:""}<p class="dim" style="margin:0">Один запрос, от 1 до 3 часов, 35 000 тг. Нажми кнопку: помощник уже будет знать твою программу и сферу.</p></div>
+<a class="btn glow" href="https://t.me/akademiya_kvant_bot?start=${code}" target="_blank" rel="noopener">Хочу открыть свои ключи</a>
+<a class="btn ghost" href="https://t.me/+2v5c8znsaONjY2Fi" target="_blank" rel="noopener">Пока не готова: прийти фигурой бесплатно</a>
+<details class="box" style="margin-top:16px"><summary>Твоя практика на 3 дня и всё заключение</summary><div class="res" style="margin-top:10px">${esc(text)}</div></details>
+<button class="btn ghost" onclick="cp(this)">Скопировать заключение</button>
 <div class="note" style="margin-top:14px">Это не диагноз, а карта: ты увидела, что держит, и теперь можешь вернуть чужое и взять своё.</div>
-<button class="btn ghost" onclick="Object.assign(S,{step:0,sc:[],excl:[],roots:[],body:null,feel:null,pm:null,pp:null,ask:'',sent:null,pos:null,fig:null,fig8:null,rqBack:false});render()">Пройти заново</button>`}
+<button class="btn ghost" onclick="restart()">Пройти заново</button>`}
+function unlock(b){b.classList.remove("shake");void b.offsetWidth;b.classList.add("shake","open");vib([15,30,15]);chime(330,.08)}
+function restart(){Object.assign(S,{step:0,sc:[],excl:[],roots:[],body:null,feel:null,pm:null,pp:null,ask:"",sent:null,pos:null,fig:null,fig8:null,rqBack:false,yrs:null,cost:[],rd:7,dream:"",f8:[],rev:false,moved:0});render();window.scrollTo(0,0)}
 function cp(b){try{navigator.clipboard.writeText(window._t).then(()=>b.textContent="Скопировано")}catch(e){b.textContent="Выдели текст и скопируй вручную"}}
+
+/* ----- перетаскивание фигур ----- */
 const nrm=a=>{a%=360;if(a>180)a-=360;if(a<=-180)a+=360;return a};
-function bindField(nm){nm=nm||'fig';const f=document.getElementById('fld'),ks=Object.keys(S[nm]);
-const place=k=>{const el=document.getElementById('f_'+k),o=S[nm][k];el.style.left=`calc(${o.x*100}% - 31px)`;el.style.top=`calc(${o.y*100}% - 31px)`;el.firstChild.style.transform=`rotate(${o.a}deg)`;el.classList.toggle('on',S.sel===k)};
-window._pl=place;const chk=()=>{document.getElementById('bf').disabled=!S.moved};
-ks.forEach(k=>{place(k);const el=document.getElementById('f_'+k);let d=false;
-el.addEventListener('pointerdown',e=>{e.preventDefault();S.sel=k;ks.forEach(place);el.setPointerCapture(e.pointerId);d=true});
-el.addEventListener('pointermove',e=>{if(!d)return;const r=f.getBoundingClientRect(),o=S[nm][k];o.x=Math.min(.93,Math.max(.07,(e.clientX-r.left)/r.width));o.y=Math.min(.9,Math.max(.1,(e.clientY-r.top)/r.height));S.moved=1;place(k);chk()});
-['pointerup','pointercancel'].forEach(v=>el.addEventListener(v,()=>d=false))});
-const rot=dg=>{if(!S.sel)return;S[nm][S.sel].a+=dg;S.moved=1;place(S.sel);chk()};
-document.getElementById('rl').onclick=()=>rot(-45);document.getElementById('rr').onclick=()=>rot(45);chk()}
-function readField(){const f=document.getElementById('fld'),W=f.clientWidth,H=f.clientHeight,me=S.fig.me;
+function bindField(nm){const f=document.getElementById("fld"),ks=Object.keys(S[nm]);
+const place=k=>{const el=document.getElementById("f_"+k),o=S[nm][k];if(!el)return;el.style.left=`calc(${o.x*100}% - 38px)`;el.style.top=`calc(${o.y*100}% - 30px)`;el.firstChild.style.transform=`rotate(${o.a}deg)`;el.classList.toggle("on",S.sel===k)};
+window._pl=place;const chk=()=>{const b=document.getElementById("bf");if(b)b.disabled=!S.moved};
+ks.forEach(k=>{place(k);const el=document.getElementById("f_"+k);let d=false,mv=false;
+el.addEventListener("pointerdown",e=>{e.preventDefault();S.sel=k;ks.forEach(place);el.setPointerCapture(e.pointerId);d=true;mv=false;vib(8)});
+el.addEventListener("pointermove",e=>{if(!d)return;const r=f.getBoundingClientRect(),o=S[nm][k];o.x=Math.min(.93,Math.max(.07,(e.clientX-r.left)/r.width));o.y=Math.min(.8,Math.max(.1,(e.clientY-r.top)/r.height));S.moved=1;mv=true;place(k);chk()});
+["pointerup","pointercancel"].forEach(v=>el.addEventListener(v,()=>{if(d&&mv){chime(440+Math.random()*220,.06);liveNote()}d=false}))});
+const rot=dg=>{if(!S.sel){const c=document.getElementById("live")||document.getElementById("an8");return}S[nm][S.sel].a+=dg;S.moved=1;place(S.sel);chk();vib(10);chime(560,.05);liveNote()};
+document.getElementById("rl").onclick=()=>rot(-45);document.getElementById("rr").onclick=()=>rot(45);document.getElementById("r180").onclick=()=>rot(180);chk()}
+function readField(){const f=document.getElementById("fld");if(!f)return;const W=f.clientWidth,H=f.clientHeight,me=S.fig.me;
 const ang=(a,b)=>Math.atan2((b.x-a.x)*W,-(b.y-a.y)*H)*180/Math.PI;
 const cat=k=>{const o=S.fig[k];if(Math.abs(nrm(o.a-ang(o,me)))>110)return 3;const r=nrm(ang(me,o)-me.a);if(Math.abs(r)<60)return 2;return r>0?1:0};
-S.pm=cat('mm');S.pp=cat('pp');S.rqBack=Math.abs(nrm(ang(me,S.fig.rq)-me.a))>=120}
-(function(){const c=document.getElementById('bg'),x=c.getContext('2d');let W,H,t=0,mx=.5,my=.5,pulse=0;const dpr=Math.min(2,devicePixelRatio||1),rm=matchMedia('(prefers-reduced-motion: reduce)').matches;
-const size=()=>{W=innerWidth;H=innerHeight;c.width=W*dpr;c.height=H*dpr;x.setTransform(dpr,0,0,dpr,0,0);x.fillStyle='#0a0820';x.fillRect(0,0,W,H)};
+S.pm=cat("mm");S.pp=cat("pp");S.rqBack=Math.abs(nrm(ang(me,S.fig.rq)-me.a))>=120}
+
+/* ----- фон ----- */
+(function(){const c=document.getElementById("bg"),x=c.getContext("2d");let W,H,t=0,mx=.5,my=.5,pulse=0;const dpr=Math.min(2,devicePixelRatio||1),rm=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const size=()=>{W=innerWidth;H=innerHeight;c.width=W*dpr;c.height=H*dpr;x.setTransform(dpr,0,0,dpr,0,0);x.fillStyle="#0a0820";x.fillRect(0,0,W,H)};
 const R=[];for(let i=0;i<12;i++)R.push({cx:Math.random(),cy:Math.random(),r:.18+Math.random()*.35,a:Math.random()*6.28,sw:1.2+Math.random()*2.2,w:(Math.random()<.5?-1:1)*(.0015+Math.random()*.003),h:245+Math.random()*75,ph:Math.random()*6.28,k:10+(Math.random()*8|0)});
-size();addEventListener('resize',size);addEventListener('pointermove',e=>{mx=e.clientX/innerWidth;my=e.clientY/innerHeight});addEventListener('pointerdown',()=>{pulse=1});
-function step(){t+=1;x.globalCompositeOperation='source-over';x.fillStyle='rgba(10,8,32,.14)';x.fillRect(0,0,W,H);x.globalCompositeOperation='lighter';pulse*=.96;const m=Math.min(W,H);
+size();addEventListener("resize",size);addEventListener("pointermove",e=>{mx=e.clientX/innerWidth;my=e.clientY/innerHeight});addEventListener("pointerdown",()=>{pulse=1});
+function step(){t+=1;x.globalCompositeOperation="source-over";x.fillStyle="rgba(10,8,32,.14)";x.fillRect(0,0,W,H);x.globalCompositeOperation="lighter";pulse*=.96;const m=Math.min(W,H);
 for(const q of R){q.a+=q.w*(1+pulse*4);const cx=(q.cx+(mx-q.cx)*.06+Math.sin(t*.003+q.ph)*.04)*W,cy=(q.cy+(my-q.cy)*.06+Math.cos(t*.0027+q.ph)*.04)*H,r=q.r*m*(1+Math.sin(t*.004+q.ph)*.06+pulse*.1);
 for(let j=0;j<q.k;j++){const f=j/q.k,s0=q.a+f*.5,e0=s0+1.3+Math.sin(t*.005+j)*.25;x.beginPath();x.arc(cx,cy,r*(1+f*.12),s0,e0);x.lineWidth=q.sw*(1-f*.6);x.strokeStyle=`hsla(${q.h+f*40},85%,${55+f*25}%,${.05+.05*(1-f)})`;x.stroke()}
-const ea=q.a+1.3,ex=cx+Math.cos(ea)*r,ey=cy+Math.sin(ea)*r;
-for(let j=0;j<7;j++){const g=ea+1.57+(j-3)*.12;x.beginPath();x.moveTo(ex,ey);x.quadraticCurveTo(ex+Math.cos(g)*r*.2,ey+Math.sin(g)*r*.2,ex+Math.cos(g+.5)*r*.35,ey+Math.sin(g+.5)*r*.35);x.lineWidth=1;x.strokeStyle=`hsla(${q.h+20},90%,70%,.12)`;x.stroke()}
-x.beginPath();x.arc(ex,ey,2.2,0,6.283);x.fillStyle='rgba(235,225,255,.35)';x.fill()}}
+const ea=q.a+1.3,ex=cx+Math.cos(ea)*r,ey=cy+Math.sin(ea)*r;x.beginPath();x.arc(ex,ey,2.2,0,6.283);x.fillStyle="rgba(235,225,255,.35)";x.fill()}}
 if(rm){for(let i=0;i<160;i++)step()}else{(function loop(){step();requestAnimationFrame(loop)})()}})();
-const NAMES={me:"Я",mm:"Мама",pp:"Папа",gm1:"Бабушка мамы",gf1:"Дедушка мамы",gm2:"Бабушка папы",gf2:"Дедушка папы",rq:"Мой запрос"};
-const IDEAL={me:{x:.5,y:.5,a:0},rq:{x:.5,y:.13,a:180},mm:{x:.37,y:.72,a:0},pp:{x:.63,y:.72,a:0},gm1:{x:.2,y:.9,a:0},gf1:{x:.34,y:.9,a:0},gm2:{x:.66,y:.9,a:0},gf2:{x:.8,y:.9,a:0}};
-const ESC={me:{x:.5,y:.62,a:0},rq:{x:.5,y:.91,a:0},mm:{x:.38,y:.32,a:180},pp:{x:.62,y:.32,a:180},gm1:{x:.15,y:.12,a:180},gf1:{x:.38,y:.12,a:180},gm2:{x:.62,y:.12,a:180},gf2:{x:.85,y:.12,a:180}};
-function l8(){if(!S.fig8)S.fig8={gm1:{x:.15,y:.5,a:0},gf1:{x:.38,y:.5,a:0},gm2:{x:.62,y:.5,a:0},gf2:{x:.85,y:.5,a:0},me:{x:.15,y:.82,a:0},mm:{x:.38,y:.82,a:0},pp:{x:.62,y:.82,a:0},rq:{x:.85,y:.82,a:0}};S.moved=0;S.sel=null;
-return `<span class="badge">ФИНАЛ · ВЗГЛЯД НА СВОЮ ЖИЗНЬ</span><h2>Куда ты смотришь?</h2><p class="dim">Расставь всех, как чувствуешь: ты, мама, папа, бабушки, дедушки и твой запрос («${esc(S.area)}»). Куда они стоят и куда смотрят? Выбери фигуру и поверни её стрелками.</p><div id="fld" style="height:380px">${Object.keys(NAMES).map(k=>`<div class="fg ${k==="me"?"me":""}" id="f_${k}" role="button" aria-label="${NAMES[k]}"><div class="arrw"></div><div class="ci">${NAMES[k]}</div></div>`).join("")}</div><div class="rotb"><button id="rl" aria-label="Повернуть влево">⟲</button><button id="rr" aria-label="Повернуть вправо">⟳</button></div><button class="btn" id="bf" disabled onclick="read8()">Считать поле</button><div id="an8"></div><div id="demo8" style="display:none"><div id="demob"><div class="box" id="cap8">Нажми, чтобы увидеть, как это бывает в жизни.</div><button class="btn ghost" onclick="anim(ESC);cap('Мы разворачиваемся к претензиям, к родителям, бабушкам и дедушкам. Любим их учить и убегаем на чужие места. Тогда мы стоим спиной к своей жизни: к деньгам, отношениям, здоровью.')">Покажи, как мы убегаем</button><button class="btn ghost" onclick="anim(IDEAL);cap('Чтобы идти в жизнь, мы смотрим вперёд, на свой запрос. Род стоит сзади и передаёт силу через плечи. Это и значит занять своё место.')">Покажи, как это работает</button></div><div id="vbox" class="box" style="display:none;margin-top:14px"><div class="fig">Объяснение Венеры</div><audio id="va" controls preload="metadata" style="width:100%"></audio><video id="vv" controls playsinline preload="metadata" style="width:100%;display:none;margin-top:8px"></video></div><div class="box" style="border-left-color:#a98cff">Это только твой первый взгляд. Что стоит за ним в твоём роду и как развернуться к своей жизни, видно на разборе. Посмотри своё заключение, там мы собрали твой вопрос.</div><button class="btn" onclick="go(9)">Моё заключение</button></div>`}
-function cap(t){document.getElementById('cap8').textContent=t}
-function anim(T){const ks=Object.keys(T),from={};ks.forEach(k=>from[k]={...S.fig8[k]});const t0=performance.now();(function f(n){const p=Math.min(1,(n-t0)/1400),e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;ks.forEach(k=>{const a=S.fig8[k],b=from[k],c=T[k];a.x=b.x+(c.x-b.x)*e;a.y=b.y+(c.y-b.y)*e;a.a=b.a+nrm(c.a-b.a)*e;window._pl&&window._pl(k)});if(p<1)requestAnimationFrame(f)})(t0)}
-function read8(){const f=document.getElementById('fld'),W=f.clientWidth,H=f.clientHeight,F=S.fig8,me=F.me;const ang=(a,b)=>Math.atan2((b.x-a.x)*W,-(b.y-a.y)*H)*180/Math.PI,rel=o=>nrm(ang(me,o)-me.a);const A=['mm','pp','gm1','gf1','gm2','gf2'];
-const ahead=A.filter(k=>Math.abs(rel(F[k]))<60),away=A.filter(k=>Math.abs(nrm(F[k].a-ang(F[k],me)))>110),qb=Math.abs(rel(F.rq))>=120,qf=Math.abs(rel(F.rq))<60,t=[];
-if(qf&&!ahead.length)t.push(['g','Твой взгляд на запросе, а род за твоей спиной. Это порядок: сила рода идёт тебе в спину.']);
-if(qb)t.push(['r',`Ты стоишь спиной к своему запросу («${S.area}»). Ты смотришь не в свою жизнь.`]);
-if(ahead.length)t.push(['r',`Перед тобой стоят: ${ahead.map(k=>NAMES[k]).join(", ")}. Твой взгляд занят ими: претензии, желание учить и спасать.`]);
-if(away.length)t.push(['r',`Отвернулись от тебя: ${away.map(k=>NAMES[k]).join(", ")}. Поток силы рода до тебя не доходит.`]);
-if(!t.length)t.push(['r','Картина неоднозначная. Посмотри сердцем: кто стоит ближе всех к запросу, а кто за твоей спиной?']);
-document.getElementById('an8').innerHTML=t.map(x=>`<div class="${x[0]==='g'?'note':'warn'}">${x[1]}</div>`).join("");
-document.getElementById('demo8').style.display='block';const good=t.length===1&&t[0][0]==='g';document.getElementById('demob').style.display=good?'none':'block';
-const va=document.getElementById('va'),vv=document.getElementById('vv'),vb=document.getElementById('vbox');va.onloadedmetadata=()=>{vb.style.display='block'};vv.onloadedmetadata=()=>{vb.style.display='block';vv.style.display='block'};va.src='voice.mp3';vv.src='video.mp4';
-document.getElementById('an8').scrollIntoView({behavior:'smooth'})}
 render();
 </script>
 </body>
