@@ -97,7 +97,7 @@ details summary{cursor:pointer;color:var(--gold);font-weight:700}
 <button id="snd" onclick="sndToggle()" aria-label="Звук">🔊</button>
 <div class="wrap"><div id="app"></div></div>
 <script>
-/* ===== ИГРА «СВОЁ МЕСТО» v8.6 — Диагностика жизни (методика Венеры Татиной) ===== */
+/* ===== ИГРА «СВОЁ МЕСТО» v8.9 — Диагностика жизни (методика Венеры Татиной) ===== */
 const AREAS=["Деньги","Отношения","Здоровье и тело","Предназначение","Семья и род","Внутреннее состояние"];
 const ASKPH={"Деньги":"Например: деньги приходят и сразу уходят, не получается накопить","Отношения":"Например: в отношениях повторяется одно и то же, меня не ценят","Здоровье и тело":"Например: постоянно нет сил, тело устаёт","Предназначение":"Например: не понимаю, чем хочу заниматься, всё откладываю","Семья и род":"Например: всё держится на мне, родные тянут силы","Внутреннее состояние":"Например: внутри нет покоя, тревога и обида"};
 const AREACOST={"Деньги":"деньги проходят мимо тебя или уходят на других","Отношения":"в паре повторяется то же чужое место","Здоровье и тело":"тело устаёт держать то, что не твоё","Предназначение":"твоё дело ждёт, пока ты развернёшься к нему","Семья и род":"в семье ты несёшь то, что тебе не принадлежит","Внутреннее состояние":"внутри нет покоя: ты всё время в чужой жизни"};
@@ -126,7 +126,7 @@ const qMine=i=>{const q=QS[i],a=S.qa[i];if(q.k==="one")return q.m;if(q.k==="mult
 const qDone=i=>{const q=QS[i],a=S.qa[i];if(a==null)return false;if(q.k==="one")return true;if(q.k==="multi")return a.length>0;return a.mm!=null&&a.pp!=null};
 const LIFEQ=[["kids","Дети",[["yes","Есть"],["no","Нет"]]],["prt","Партнёр",[["yes","Есть"],["no","Нет"],["hard","Всё сложно"]]],["mon","Деньги",[["ok","Хватает и растут"],["flow","Приходят и уходят"],["tight","Еле хватает"],["debt","Долги"]]],["rlz","Своё дело",[["joy","Есть и радует"],["hard","Есть, но тяжело"],["delay","Откладываю"],["lost","Не знаю, чем заниматься"]]]];
 const _dx=b=>{const s=atob(b),k="VeneraTatina2026",u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i)^k.charCodeAt(i%k.length);return new TextDecoder().decode(u)};
-const PLACE=JSON.parse(_dx("LUcBR0gadg9WU0yxr+CH59e0/7T6sNhBpeu+3x4Q47GH577bUrHpscFJv+PiguKIh/RMSVAVdltWucywuRDihIbSv+qi2oTRVLnTsYIQ47eG0L7Uo+50scm50LC64bEWhtm+1aLdhepUudZB4o/ihobav+5QTXYWVlNMsZDhuRaH5r/iotmF6aXlQkHjseKJhtW/5KLRhNSl4b/tHhDjtobQv+2i0YTUpeG/7RLghebmRb7YotmF5FpJvsPjuxLm67XbtPOwxbD8uOJB4ojjs3a077TxseCw+LnfsLEQ4oSG2b7Qo+CF46TXTrCz4IDm6LXbtctBhNek0b7W4o3ijnhHQkcRQ25DpMu+0+KO4o52tO+1yrHvsP9JvtkS4Ibm47XTtP6x57HMSb/i47XiiIbRv+qj43SxybneQeO347WG07/mo+90scm50LC64bEYdrXMtPlBheCl677f4ojjvofpTrXJseyw8rnQsY4Q4ox2tO61zLHgscy47LGH4Inn2bXSSVKx5EGk006ws+CA5ui127XLQYTXpNG+1uKN4o52tO+1zbHsscm50LGLHhAadBUHBlBbdrHWuOVB47HjtIbbvt2j6YXtVLnVsYrhtObotdJFott0sci53rGO4IcWht1Otc2x5LHLudtB4ogS5uu127TzsMWw/LjiQeKI47N2tdO1zLDcsPdHTrGiEOO0hte+26PudLHCudaxheCP59pHE0lQAnZbD0sAQwgS4pd2tdG08rHhsPa527GP4IXm7rXbtctBhNtUuO6xjOCG5u607LXHse+w+7nSQx4SRhRsR77Ho+p0sPW47LGM4Irn3rTiRaLahNml777f4owS5uxFv+Wi34TVpNG/4+KF4o2H6r7ZUrDVQaTXvtDiiOKChtu+3FBNdhZWU0yxoOCP59W07LTysexBpN++2eKC46eH506087DTsOW47EHiihLm6rXetc6x4UGk0b7a4ogS5um13rXNseFbVKvFsY7gj+bjRb7YotSE1aTXvtXigOKNht2s3lxBhMOl4k6xgOGz58dFvtCj6IXwVLnYsYbho+fetOJJUrDTsPa50EHijuKLht1Otcqx47HIuduxj+G959S077T9QYTZpNK+2RLgjefWtda1xbHpscS44LCwHhAadAZMX1Cxy7HKudSxghDig4fkv+ej7XSxy7jusYfhsObjtdO1xbHssPtFTrCw4bkWhti+0FKx5bHBuO6wo+G659pFvt2j5HSw9bnWsYnhsRh2tf5Fo+aE1KXpvtTihxLm6rXetc6w10Gk0U6xjeCC5um07UWi23Sw9rnbsYPghxaG3b7Ro/CF41S50bGM4bDm6LXURaPhhN+k3b7RCBDigobQvtij7YTSpNFCQeKL47iG1L7botOF7VhJvtbihOKIh+W+26LThe2k3EBDHhJCXzVHVEeiw4XqVLjvsLDgjObutOa0/kGE2qTRv+fijuKKdrXURaLdhNGk1b7UEuCKFobavtWi3oTUVLjvQeKP47aG0L/notSE3KTevtniheKPeEW+9VKw1rHGudCwvRDigIbdvtKi3IXtVhRCQ1kSCE10C0xfULHGQaTdvtTjsuO3ht++26LYdLHLudCxheCK59C11rXKQ3hDAEtUQ+KiEufXtdy1zLHhsc1JvtfiiOKBhti+3VKw1rD/Sb7U47njp3a10rXCse+xwbnTsL7giObmtOFHXkMjQ05LvsPjuxLm4LXatOOw3LD4RU6wteGw5uhFvtGi0YTVpeq/4x4Q4omG277Zot+E0qXqv+MeEOO2htC/7aLRheNaSb7/47LihIbQv+ej4IXjpNu+1OKN4ouG27/ko+OF7VS52bGCEOO0hte+26PvdLHCudaxheCP59pFvt6i1ITXpNG/4xLhsRaG0b/lo+KE0qTRv+QcEh4UNUdUR6L+hN+k077REuGy5uO05rXCsNqw9km+1eOw47WG1r7dotR4QaXrvtPijuO5drXYtcqx47HJuOJB4orihobfTrXDsNexwLjssYwQ4ouG0E61xrHqQaTTvt/ijeOwhtVOtPCx5rHKuOFbEuCKFobRvtCi3IXtpNq+2R4Q4o52tO61x7DcscG507GK4b0adrXWRaLfheOk1L7f47jig4bYvt2j7npDWEseCFESCBSGx7/uUrDVsPa50LGK4brn2kW+2aLRhNqk3L7c47zijIbbvtxSseuxwbjusYfghhaG2b7Vot2E36TQTrGKEOKJhtW+2qLfhNhUudZB4obigof0v+2j7XpBpPlOsLDggObotOFFoteE2aTevtzjvBBLekcAR0gadg9WU0yxreCM59G07LXKQYTcpNlOsLPggObotP+1zkGE3aTcv+DjsuKDdElMEVBbdrHWuOVB47PihIbVvtOi0YTUpeG/7RLhsubotdq1yrDWscG51bGH4IsWht1OtPOx5LHIud5B47Dig4ftvtWi1IXppeVOsLPggObotOBFoteE2aTevtzjvBAadBJMX1Cxy7HKSb7f47LihIbQv+ei0YTdVLjssLkQ4ouG0E608bDTscy45rC+EOO2htu+0aLZheOk3L7a4oXij3pFvtii1HSxwLnbsLLghObutOa0/kGE3KTZTrGP4Irn00W/5KPmhfCl606xihDii4bQTrXEseCw5bjmsL4cEufRtOy1zEGE1qTZTrCw4Ifm57ThRaPhhNSl4b7R47IcFHpHDUdIQ4T2pNS+0eO34o6H50JFo+OE31hJv+bjsuKIdrXatcew1LHCudawsBwS59e11rXGseyw9km+0uKL47WG1L7TotRuQaTbTrCw4Izm6klOtcix5LHOSb7d4oDiiobVTrXKQYTepNm+3uKAEufXtOy1zLDbsPZJvtMS4bDm5LXQtOOx6EGk1r7f4ovig3hHQkcCCDdDTku+/eKA4oqG1U61ykGE3qTZvt7igBLn1UW/56LUhNCl5k6xheCCFofkvtqi2YTcpNe+2B4Q47SH7k6087Hoscq47LCy4Irn3rTiRaLTdLD1udyxjOG8FobTvt2i1oTcpeVAQ09N"));
+const PLACE=JSON.parse(_dx("LUcBR0gadg9WU0yxr+CH59e0/7T6sNhBpeu+3x4Q47GH577bUrHpscFJv+PiguKIh/RMSVAVdltWucywuRDihIbSv+qi2oTRVLnTsYIQ47eG0L7Uo+50scm50LC64bEWhtm+1aLdhepUudZB4o/ihobav+5QTXYWVlNMsZDhuRaH5r/iotmF6aXlQkHjseKJhtW/5KLRhNSl4b/tHhDjtobQv+2i0YTUpeG/7RLghebmRb7YotmF5FpJvsPjuxLm67XbtPOwxbD8uOJB4ojjs3a077TxseCw+LnfsLEQ4oSG2b7Qo+CF46TXTrCz4IDm6LXbtctBhNek0b7W4o3ijnhHQkcRQ25DpMu+0+KO4o52tO+1yrHvsP9JvtkS4Ibm47XTtP6x57HMSb/i47XiiIbRv+qj43SxybneQeO347WG07/mo+90scm50LC64bEYdrXMtPlBheCl677f4ojjvofpTrXJseyw8rnQsY4Q4ox2tO61zLHgscy47LGH4Inn2bXSSVKx5EGk006ws+CA5ui127XLQYTXpNG+1uKN4o52tO+1zbHsscm50LGLHhAadBUHBlBbdrHWuOVB47HjtIbbvt2j6YXtVLnVsYrhtObotdJFott0sci53rGO4IcWht1Otc2x5LHLudtB4ogS5uu127TzsMWw/LjiQeKI47N2tdO1zLDcsPdHTrGiEOO0hte+26PudLHCudaxheCP59pHE0lQAnZbD0sAQwgS4pd2tdG08rHhsPa527GP4IXm7rXbtctBhNtUuO6xjOCG5u607LXHse+w+7nSQx4SRhRsR77Ho+p0sPW47LGM4Irn3rTiRaLahNml777f4owS5uxFv+Wi34TVpNG/4+KF4o2H6r7ZUrDVQaTXvtDiiOKChtu+3FBNdhZWU0yxoOCP59W07LTysexBpN++2eKC46eH506087DTsOW47EHiihLm6rXetc6x4UGk0b7a4ogS5um13rXNseFbVKvFsY7gj+bjRb7YotSE1aTXvtXigOKNht2s3lxBhMOl4k6xgOGz58dFvtCj6IXwVLnYsYbho+fetOJJUrDTsPa50EHijuKLht1Otcqx47HIuduxj+G959S077T9QYTZpNK+2RLgjefWtda1xbHpscS44LCwHhAadAZMX1Cxy7HKudSxghDig4fkv+ej7XSxy7jusYfhsObjtdO1xbHssPtFTrCw4bkWhti+0FKx5bHBuO6wo+G659pFvt2j5HSw9bnWsYnhsRh2tf5Fo+aE1KXpvtTihxLm6rXetc6w10Gk0U6xjeCC5um07UWi23Sw9rnbsYPghxaG3b7Ro/CF41S50bGM4bDm6LXURaPhhN+k3b7RCBDigobQvtij7YTSpNFCQeKL47iG1L7botOF7VhJvtbihOKIh+W+26LThe2k3EBDHhJCXzVHVEeiw4XqVLjvsLDgjObutOa0/kGE2qTRv+fijuKKdrXURaLdhNGk1b7UEuCKFobavtWi3oTUVLjvQeKP47aG0L/notSE3KTevtniheKPeEW+9VKw1rHGudCwvRDigIbdvtKi3IXtpNq+2R4Q4o52tO61x7DcscG507GK4b0adrXWRaLfheOk1L7f47jig4bYvt2j7npDWEseCFESCBSGx7/uUrDVsPa50LGK4brn2kW+2aLRhNqk3L7c47zijIbbvtxSseuxwbjusYfghhaG2b7Vot2E36TQTrGKEOKJhtW+2qLfhNhUudZB4obigof0v+2j7XpBpPlOsLDggObotOFFoteE2aTevtzjvBBLekcAR0gadg9WU0yxreCM59G07LXKQYTcpNlOsLPggObotP+1zkGE3aTcv+DjsuKDdElMEVBbdrHWuOVB47PihIbVvtOi0YTUpeG/7RLhsubotdq1yrDWscG51bGH4IsWht1OtPOx5LHIud5B47Dig4ftvtWi1IXppeVOsLPggObotOBFoteE2aTevtzjvBAadBJMX1Cxy7HKSb7f47LihIbQv+ei0YTdVLjssLkQ4ouG0E608bDTscy45rC+EOO2htu+0aLZheOk3L7a4oXij3pFvtii1HSxwLnbsLLghObutOa0/kGE3KTZTrGP4Irn00W/5KPmhfCl606xihDii4bQTrXEseCw5bjmsL4cEufRtOy1zEGE1qTZTrCw4Ifm57ThRaPhhNSl4b7R47IcFHpHDUdIQ4T2pNS+0eO34o6H50JFo+OE31hJv+bjsuKIdrXatcew1LHCudawsBwS59e11rXGseyw9km+0uKL47WG1L7TotRuQaTbTrCw4Izm6klOtcix5LHOSb7d4oDiiobVTrXKQYTepNm+3uKAEufXtOy1zLDbsPZJvtMS4bDm5LXQtOOx6EGk1r7f4ovig3hHQkcCCDdDTku+/eKA4oqG1U61ykGE3qTZvt7igBLn1UW/56LUhNCl5k6xheCCFofkvtqi2YTcpNe+2B4Q47SH7k6087Hoscq47LCy4Irn3rTiRaLTdLD1udyxjOG8FobTvt2i1oTcpeVAQ09N"));
 
 
 /* ===== РАСШИФРОВКИ (вердикты) — по материалам Мастера разборов. g:1 — ресурс, s:1 — бережно, остальное вживую ===== */
@@ -138,7 +138,8 @@ const YRS=["Меньше года","1–3 года","3–5 лет","5–10 ле�
 const YRT=["меньше года","уже 1–3 года","уже 3–5 лет","уже 5–10 лет","больше 10 лет","сколько ты себя помнишь"];
 const COST=["Денег","Отношений","Здоровья и сил","Времени","Радости","Мечты, которую отложила","Уверенности в себе"];
 const MORE=["Ещё немного, потом разберусь","Год-два, как-нибудь","Не знаю, я привыкла","Хватит. Хочу менять сейчас"];
-const MORET=["Ты ответила: «ещё немного, потом». Но «потом» обычно растягивается на годы.","Ты ответила: «год-два». Это ещё год-два тех же сценариев, той же усталости, тех же денег.","Ты ответила: «я привыкла». Именно так это и держится: к своему месту за чужой спиной привыкают.","Ты ответила: «хватит». Тогда начни прямо сейчас, шаг ниже."];
+/* Экран 2, спокойный блок: подставляется ответ игрока на вопрос «сколько ещё так стоять» */
+const MORET=["Ты сказала, что так может продолжаться ещё немного. Это ещё немного тех же сценариев и той же усталости, а «немного» часто растягивается на годы.","Ты сказала, что так может продолжаться ещё год-два. Это ещё год-два тех же сценариев и той же усталости.","Ты сказала, что не знаешь и уже привыкла. Привычка держит те же сценарии и ту же усталость ещё годы.","Ты сказала: «Хватит. Хочу менять сейчас». Значит, тех же сценариев и той же усталости больше не нужно."];
 const COSTT=["денег","отношений","здоровья и сил","времени","радости","мечты, которую ты отложила","уверенности в себе"];
 const blankP=()=>({pos:null,dist:"mid",post:null,size:null,gaze:null,face:null,feel:[]});
 const S0=()=>({step:0,area:"Деньги",ask:"",mm:blankP(),pp:blankP(),me:{post:null,gaze:null},sub:0,qi:0,qa:[],life:{},yrs:null,cost:[],rd:7,dream:"",rev:false,rs:0,ideal:false,br:0,more:null});
@@ -326,78 +327,102 @@ function sceneStart(){if(!document.getElementById("scn"))return;SC.t=0;scSet(0);
 function sceneFlip(){const b=document.getElementById("scbtn"),c=document.getElementById("sccap"),hn=document.getElementById("schint");SCcap0=SCcap0||c.textContent;const goHome=SC.t>.5;
 if(goHome){scAnim(0,()=>{for(let i=0;i<SC.n;i++)setTimeout(()=>chime(),i*180)});b.textContent="Вернуть, как сейчас";b.classList.remove("glow");c.innerHTML="<b>Ты на своём месте.</b> Река рода течёт в тебя, а через тебя — в твою жизнь. Всё, на что ты смотришь, наполняется силой.";hn.hidden=true;const br=document.getElementById("bridge");if(br){br.hidden=false;br.classList.add("fade");setTimeout(()=>br.scrollIntoView({behavior:"smooth",block:"start"}),1900)}vib([20,40,60])}
 else{scAnim(1);b.textContent="✦ Встать на своё место";b.classList.add("glow");c.textContent=SCcap0;hn.hidden=false;vib(20)}}
-const GIFTH=24,GIFTV="30 000";
-function giftLeft(){const t0=(MEM.last&&MEM.last.at)||Date.now();return Math.max(0,t0+GIFTH*36e5-Date.now())}
+/* ===== ПОДАРОК: 24 часа от ПЕРВОГО открытия экрана 3. Время хранится в localStorage и не сбрасывается при перезагрузке и повторном заходе ===== */
+const GIFTH=24,GIFTK="sm_gift_t0";
+function giftT0(){let t=0;try{t=+localStorage.getItem(GIFTK)||0;if(!t){t=Date.now();localStorage.setItem(GIFTK,String(t))}}catch(e){}if(!t){window._gt0=window._gt0||Date.now();t=window._gt0}return t}
+function giftLeft(){return Math.max(0,giftT0()+GIFTH*36e5-Date.now())}
 function giftTxt(){const ms=giftLeft();if(!ms)return"";const h=Math.floor(ms/36e5),m=Math.floor(ms%36e5/6e4);return h+" ч "+String(m).padStart(2,"0")+" мин"}
-let GT=0;function giftTick(){clearInterval(GT);const e=()=>{const els=[...document.querySelectorAll(".gtm")];if(!els.length){clearInterval(GT);return}const t=giftTxt();const h=t?`Начни в течение 24 часов — подарок твой.<br>Сгорит через: <b>${t}</b>`:"Время подарка вышло, но курс открыт.";els.forEach(el=>el.innerHTML=h)};e();GT=setInterval(e,30000)}
+let GT=0;function giftTick(){clearInterval(GT);const e=()=>{const els=[...document.querySelectorAll(".gtm")];if(!els.length){clearInterval(GT);return}const t=giftTxt();if(!t){document.querySelectorAll(".gift,.giftnote").forEach(x=>x.hidden=true);clearInterval(GT);return}els.forEach(el=>el.innerHTML=`Подарок сохраняется ещё: <b>${t}</b>`)};e();GT=setInterval(e,30000)}
 const TURNF={o:"Ты развернулась лицом к маме и папе и несёшь их ношу. А к своей жизни встала спиной — поэтому деньги проходят мимо.",c:"Ты развернулась лицом к маме и папе с обидой. А к своей жизни встала спиной — поэтому деньги проходят мимо.",k:"Ты стоишь перед мамой и папой маленькой и ждёшь. А своя жизнь и свои деньги так и остаются не до конца твоими.",n:"Ты почти на своём месте. То, что держит деньги, сидит глубже: в том, как мама и папа стоят в твоём поле."};
-/* ===== ОПЛАТА: сюда вставить прямые ссылки Kaspi. Пока пусто — кнопка ведёт в WhatsApp с готовым текстом ===== */
+/* ===== ЦЕНА И ОПЛАТА =====
+   DVP — цена Денежного Взлёта (меняется только здесь).
+   ACCESS_TIME — за сколько открываешь доступ после чека, например "2 часов" (получится «в течение 2 часов»). Пусто — фраза без срока.
+   KASPI — ссылка Kaspi. Сумму в ссылку Kaspi не зашить, поэтому шаг 2 «Введи сумму». */
+const DVP="9 900",ACCESS_TIME="";
 const KASPI="https://pay.kaspi.kz/pay/pyquwzeb";
 const PAY={dv:KASPI,kvs:KASPI,kvf:KASPI,razbor:KASPI};
-const AMT={dv:"9 990",kvs:"50 000",kvf:(Date.now()<Date.UTC(2026,11,17,19)?"150 000":"180 000"),razbor:"35 000"};
+const AMT={dv:DVP,kvs:"50 000",kvf:(Date.now()<Date.UTC(2026,11,17,19)?"150 000":"180 000"),razbor:"35 000"};
 const WA="77781436982";
 const waLink=t=>"https://wa.me/"+WA+"?text="+encodeURIComponent(t);
-const PAYNAME={dv:"Денежный Взлёт — 9 990 тг",kvs:"Примерка Квантового Взлёта — 50 000 тг",kvf:"Квантовый Взлёт целиком",razbor:"Разбор с Венерой — 35 000 тг"};
-function payBtn(k,label,cls){const code=window._code||"";const href=PAY[k]||waLink("Здравствуйте, Венера! Я прошла игру «Своё место» и хочу: "+PAYNAME[k]+". Мой код: "+code);return `<a class="btn ${cls||""}" href="${href}" target="_blank" rel="noopener">${label}</a>`+(PAY[k]?`<p class="amt">В Kaspi введите сумму: <b>${AMT[k]} тг</b></p>`:"")+(PAY[k]?`<a class="paid" href="${waLink("Я оплатила: "+PAYNAME[k]+". Мой код игры: "+code+". Пришлите, пожалуйста, доступ.")}" target="_blank" rel="noopener">Уже оплатила? Нажми — и получи доступ в WhatsApp</a>`:"")}
+const PAYNAME={dv:"Денежный Взлёт — "+DVP+" тг",kvs:"Примерка Квантового Взлёта — 50 000 тг",kvf:"Квантовый Взлёт целиком",razbor:"Разбор с Венерой — 35 000 тг"};
+function payOpen(k){const e=document.getElementById("pay_"+k);if(!e)return;e.hidden=false;e.classList.add("fade");vib(20);chime(740,.06);setTimeout(()=>e.scrollIntoView({behavior:"smooth",block:"start"}),80)}
+function payBtn(k,label,cls){const code=window._code||"";if(!PAY[k])return `<a class="btn ${cls||""}" href="${waLink("Здравствуйте, Венера! Я прошла игру «Своё место» и хочу: "+PAYNAME[k]+". Мой код: "+code)}" target="_blank" rel="noopener">${label}</a>`;
+const tm=ACCESS_TIME?" в течение "+ACCESS_TIME:"";
+return `<button class="btn ${cls||""}" onclick="payOpen('${k}')">${label}</button><div id="pay_${k}" hidden><div class="box" style="font-size:15px"><b>Оплата через Kaspi — 3 шага</b><ol style="margin:6px 0 0;padding-left:20px"><li>Нажми кнопку ниже — откроется Kaspi.</li><li>Введи сумму: <b style="color:var(--gold);font-size:18px">${AMT[k]} тг</b>.</li><li>Вернись сюда и нажми «Я оплатила». Пришли чек в WhatsApp, и${tm} я открою тебе доступ.</li></ol></div><a class="btn" href="${PAY[k]}" target="_blank" rel="noopener">Открыть Kaspi</a><a class="btn ghost" href="${waLink("Я оплатила: "+PAYNAME[k]+". Мой код игры: "+code+". Пришлите, пожалуйста, доступ.")}" target="_blank" rel="noopener">Я оплатила — получить доступ</a></div>`}
 function cardsBy(bad,good,showGood){return [["mm","👩 Мама"],["pp","👨 Папа"],["me","✦ Ты и вся картина"]].map(([w,tt])=>{const B=bad.filter(f=>f.w===w),G=showGood?good.filter(f=>f.w===w):[];if(!B.length&&!G.length)return"";return `<div class="fig" style="font-size:19px;margin-top:18px">${tt}</div>`+B.map((f,i)=>card(f,i===0)).join("")+G.map(f=>`<div class="note"><b>${esc(f.t)}.</b> ${esc(f.x)}</div>`).join("")}).join("")}
 const RSN=["Расшифровка","Твоя жизнь","Твой путь"];
 const rsHead=()=>`<div class="rsbar">${RSN.map((t,i)=>`<span class="${i===S.rs?"on":i<S.rs?"ok":""}">${i+1}. ${t}</span>`).join("")}</div>`;
 function rsGo(n){S.rs=n;render();window.scrollTo(0,0);chime(660,.05)}
+/* отзывы: файлы otzyv1.jpg, otzyv2.jpg лежат рядом с игрой; если файла нет — картинка тихо исчезает */
+const OTZ=["otzyv1.jpg","otzyv2.jpg"];
 function result(){const{text,bad,good,P,pl,lay}=summary();window._t=text;const code=("a"+AREAS.indexOf(S.area)+"_m"+P.p+"_"+bad.slice(0,4).map(f=>f.c).join("_")).slice(0,64);window._code=code;
-if(!S.rev)return `<span class="badge">ТВОЯ РАСШИФРОВКА</span><h2 style="text-align:center">Поле собрало твою картину</h2><p class="dim" style="text-align:center">Ты увидела маму и папу и честно рассказала, как живёшь. Осталось открыть, что это значит.</p><button class="reveal" onclick="S.rev=true;S.rs=0;doneRun();vib([40,60,40]);chime(587,.1);setTimeout(()=>chime(740,.1),200);setTimeout(()=>chime(880,.1),400);render()"><span>✦</span>Нажми, чтобы открыть<br>свою расшифровку</button>`;
+if(!S.rev)return `<span class="badge">ТВОЯ РАСШИФРОВКА</span><h2 style="text-align:center">Готово</h2><p class="dim" style="text-align:center">Ты посмотрела на маму, на папу и честно ответила, как живёшь сейчас. Из этого сложилась твоя картина. Сейчас ты увидишь, где ты стоишь и почему в жизни повторяется одно и то же.</p><button class="reveal" onclick="S.rev=true;S.rs=0;doneRun();vib([40,60,40]);chime(587,.1);setTimeout(()=>chime(740,.1),200);setTimeout(()=>chime(880,.1),400);render()"><span>✦</span>Открыть мою<br>расшифровку</button>`;
 const W=whyParts(P,lay),CR=`<p class="dim" style="text-align:center;font-size:13px;margin-top:18px">© Венера Татина. Методика и тексты защищены. Копирование запрещено.</p>`;
 /* ---- экран 1: расшифровка ---- */
 if(S.rs===0)return rsHead()+`<div class="flip"><span class="badge">ТВОЁ ПОЛЕ</span><div class="schw big">${roomSVG()}</div></div>
-<div class="note">Если сейчас подступили слёзы — это нормально. Так душа узнаёт правду о себе. Сделай вдох и медленный выдох. Ты в безопасности.</div>
-<h2>Что показало поле</h2>
+<div class="note">Если сейчас подступили слёзы, это нормально. Так бывает, когда видишь то, что давно чувствовала.</div>
+<h2>Что показала твоя картина</h2>
 ${cardsBy(bad.slice(0,2),good,true)||`<div class="note">Твоё поле спокойное: мама и папа на своих местах.</div>`}
-${bad.length>2?`<div class="lock open" onclick="unlock(this)"><b style="font:700 18px Georgia,serif;color:var(--gold)">Полная расшифровка — впереди</b><small>Ещё ${bad.length-2} ${bad.length-2<5?"сигнала":"сигналов"} твоего поля пока закрыты. Сначала посмотри, как это проявляется в твоей жизни и где твой путь. А в самом конце поле откроется целиком.</small></div>`:""}
+${bad.length>2?`<button class="btn ghost" id="fullb" onclick="this.hidden=true;const e=document.getElementById('fullr');e.hidden=false;e.classList.add('fade');vib(20)">Показать ещё ${bad.length-2} ${bad.length-2<5?"сигнала":"сигналов"} ↓</button><div id="fullr" hidden>${cardsBy(bad.slice(2),good,false)}</div>`:""}
+<div class="note">Это не диагноз, а карта: сигнал, а не приговор.</div>
 <p class="phrase" style="font-size:19px;margin-top:22px">А теперь посмотри, что это делает<br>с твоей жизнью.</p>
 <button class="btn glow" onclick="rsGo(1)">Дальше: моя жизнь →</button>`+CR;
 /* ---- экран 2: жизнь и река рода ---- */
-if(S.rs===1)return rsHead()+`<h2 style="text-align:center">Так должна течь твоя жизнь</h2>
-<p style="text-align:center">За спиной — мама, папа и весь род. Их сила течёт к тебе, как большая река.<br>А через тебя — в деньги, дело, семью, здоровье.</p>
+if(S.rs===1)return rsHead()+`<h2 style="text-align:center">Так течёт жизнь, когда ты на своём месте</h2>
+<p style="text-align:center">За спиной мама, папа и весь род. Их сила идёт к тебе, как большая река.<br>А через тебя — в деньги, дело, семью и здоровье.</p>
 <div class="schw big" style="margin:0 -6px 8px">${sceneSVG(P)}</div>
-<p class="sccap" id="sccap">А теперь посмотри, что происходит сейчас. Река рода течёт, как текла, но приходит на пустое место: тебя там нет. А твоя жизнь — ${W.life.join(", ")} — осталась за спиной, в тени.</p>
+<p class="sccap" id="sccap">Своё место — пусто.</p>
 <span class="badge">${esc(pl.n.toUpperCase())}</span>
-<p class="phrase">${TURNF[P.p]}</p>
-<p style="text-align:center">В сфере «${esc(S.area)}» это видно так: <b>${AREACOST[S.area]}</b>.</p>
-<div class="warn">Ты стоишь так ${YRT[S.yrs]}. И это уже стоило тебе ${S.cost.map(i=>COSTT[i]).join(", ")}. ${MORET[S.more]}</div>
+<p class="phrase">Сейчас ты развернулась лицом к маме и папе и несёшь их ношу. А к своей жизни стоишь спиной.</p>
+<p style="text-align:center">В деньгах это часто видно так: деньги приходят и уходят — на других, на срочное, мимо тебя.</p>
+<div class="box">${MORET[S.more]||MORET[1]} <b>Можно иначе. И начать можно с малого.</b></div>
 <button class="btn glow" id="scbtn" onclick="sceneFlip()">✦ Встать на своё место</button>
 <p class="hint" id="schint">нажми — и посмотри, что изменится</p>
-<div id="bridge" hidden><div class="bigplace"><small>вот оно</small><span>ТВОЁ МЕСТО</span><small>река течёт в тебя — и дальше, в твою жизнь</small></div>
+<div id="bridge" hidden><div class="bigplace"><span>ТВОЁ МЕСТО</span></div>
 <p class="phrase" style="font-size:19px">На схеме ты встала одной кнопкой.<br>В жизни на своё место встают шагами.</p>
-<p style="text-align:center">И у тебя уже есть эти шаги. Я покажу, с чего начать.</p>
-<button class="btn glow" onclick="rsGo(2)">Показать мой путь →</button></div>
+<p style="text-align:center">Твой первый шаг я уже приготовила.</p>
+<button class="btn glow" onclick="rsGo(2)">Показать мой первый шаг →</button></div>
 <button class="btn ghost" onclick="rsGo(0)">← К расшифровке</button>`+CR;
 /* ---- экран 3: путь ---- */
-setTimeout(giftTick,60);const money=S.area==="Деньги";
-const mainCTA=(id)=>`<div class="path p1"${id?` id="${id}"`:""}><span class="stn">ТВОЙ ПЕРВЫЙ ШАГ</span>
-<div class="pt">💰 Денежный Взлёт</div><div class="pp">9 990 тг · 23 урока</div>
-<p>Начни с денег: на них лучше всего видно, где ты не на своём месте. Ты увидишь, куда на самом деле уходят твои деньги, перестанешь незаметно их терять и начнёшь копить.</p>
-<div class="gift"><b style="font:700 18px Georgia,serif;color:#fff">🎁 Подарок к Денежному Взлёту: медитация «Разговор с деньгами»</b>
-<p style="margin:6px 0">Голос Венеры · ценность <b>${GIFTV} тг</b> — тебе в подарок, когда начнёшь Денежный Взлёт.</p>
-<p style="margin:0 0 6px">Эта медитация сама по себе запускает глубокие процессы и открывает блоки, которые годами держат деньги.</p>
-<ul style="margin:0 0 8px;padding-left:20px"><li>Встретишься со своими деньгами один на один и услышишь, что они хотят тебе сказать</li><li>Отпустишь старое семейное «деньги — это тяжело»</li><li>Заключишь с деньгами новый договор</li></ul>
-<span class="gtm"></span></div>
-${payBtn("dv","Заходи — и твоя жизнь начнёт меняться","glow")}</div>`;
-return rsHead()+`<h2 style="text-align:center">Твой путь на своё место</h2>
-<p style="text-align:center">Ты уже увидела главное. Осталось сделать первый шаг.</p>
-${mainCTA("")}
-${bad.length>2?`<button class="btn" id="fullb" onclick="this.hidden=true;const e=document.getElementById('fullr');e.hidden=false;e.classList.add('fade');vib([20,40,20]);chime(740,.1);giftTick();e.scrollIntoView({behavior:'smooth',block:'start'})">🔓 Открыть полную расшифровку (ещё ${bad.length-2})</button>
-<div id="fullr" hidden><h2 style="margin-top:22px">Полная расшифровка</h2><p class="dim">Это остальные сигналы твоего поля. Читай спокойно, без спешки.</p>${cardsBy(bad.slice(2),good,false)}
-<p class="phrase" style="font-size:19px">Увидеть — это половина пути.<br>Вторая половина — встать на своё место.</p>
-${mainCTA("cta2")}</div>`:""}
-<div class="box offer" style="margin-top:18px"><div class="fig">А дальше — глубже</div>
-<p style="margin:0 0 8px">Денежный Взлёт — первый шаг. Когда почувствуешь, что хочешь встать на своё место во всём — в деньгах, отношениях, деле, здоровье, — тебя ждёт <b>Квантовый Взлёт</b>: 3 месяца с Венерой.</p>
-<a class="paid" style="text-align:left;margin:0 0 10px" href="${waLink("Здравствуйте, Венера! Я прошла игру «Своё место». Расскажите, пожалуйста, о Квантовом Взлёте. Мой код: "+code)}" target="_blank" rel="noopener">Узнать о Квантовом Взлёте →</a>
-<p style="margin:0 0 8px">Хочешь увидеть истинную причину «${esc(S.ask.trim())}» вживую? Есть <b>разбор с Венерой</b>.</p>
-<a class="paid" style="text-align:left;margin:0 0 10px" href="${waLink("Здравствуйте, Венера! Я прошла игру «Своё место» и хочу на разбор. Мой код: "+code)}" target="_blank" rel="noopener">Записаться на разбор →</a>
-<p style="margin:0;font-size:15px" class="dim">И чтобы не потеряться — бесплатная группа «Пространство Трансформации»: <a href="https://chat.whatsapp.com/JdXSf1uFlpwJZwUWBv8GbR" target="_blank" rel="noopener" style="color:var(--gold)">WhatsApp</a> · <a href="https://t.me/+2v5c8znsaONjY2Fi" target="_blank" rel="noopener" style="color:var(--gold)">Telegram</a></p></div>
-<details class="box"><summary>Моя расшифровка текстом</summary><div class="res" style="margin-top:10px">${esc(text)}</div></details>
-<div class="note" style="margin-top:14px">Это не диагноз, а карта твоего поля: сигнал, а не приговор.</div>
+setTimeout(giftTick,60);const gOn=giftLeft()>0;
+const otz=`<div id="otz"><div class="fig" style="text-align:center;margin:14px 0 8px">Что пишут ученицы после Денежного Взлёта</div>${OTZ.map(f=>`<img src="${f}" alt="Отзыв ученицы после Денежного Взлёта" loading="lazy" decoding="async" onerror="const w=this.parentNode;this.remove();if(!w.querySelector('img'))w.hidden=true" style="display:block;width:100%;height:auto;border-radius:12px;border:1px solid var(--bord);margin:0 0 12px">`).join("")}</div>`;
+const debt=(S.life.mon||[]).includes("debt");
+const UL=`style="margin:0 0 12px;padding-left:20px"`;
+const mainCTA=`<div class="path p1"><span class="stn">ТВОЙ ПЕРВЫЙ ШАГ</span>
+<div class="pt">💰 Денежный Взлёт</div><div class="pp">23 урока · в своём темпе · доступ сразу после оплаты</div>
+<p style="margin:0 0 6px"><b>За 23 урока ты:</b></p><ul ${UL}>
+<li>впервые увидишь всю правду о своих деньгах: сколько приходит, куда уходит и сколько ты должна — в одной картине;</li>
+<li>найдёшь, где деньги утекают незаметно, и закроешь эти дыры;</li>
+<li>${debt?"<b>получишь план, как закрывать долги</b>, и узнаешь, как договориться с банком или с человеком, которому должна":"получишь план на случай долгов и рассрочек — и перестанешь в них проваливаться"};</li>
+<li>с помощью ИИ найдёшь свои новые источники дохода — готовая подсказка уже внутри урока;</li>
+<li>начнёшь откладывать, и эти деньги станут неприкосновенными.</li></ul>
+<div class="note" style="margin:0 0 12px">⏱ Это не бесконечный курс. Около 3 часов работы на всё: можно пройти за 1–3 вечера, прямо с телефона.</div>
+${otz}
+<div class="gift"${gOn?"":" hidden"}><b style="font:700 18px Georgia,serif;color:#fff">🎁 Подарок, если оплатишь в течение 24 часов: «Разговор с деньгами»</b>
+<p style="margin:6px 0">Медитация голосом Венеры. Это не «поболтать с деньгами». Это встреча, после которой деньги перестают быть для тебя чужими. В ней ты:</p>
+<ul style="margin:0 0 8px;padding-left:20px"><li>увидишь, какие у тебя отношения с деньгами на самом деле: близко они к тебе или отвернулись;</li><li>услышишь, что деньги хотят тебе сказать;</li><li>с уважением вернёшь маме, папе и роду их «деньги — это тяжело» и разрешишь себе жить с деньгами легче;</li><li>заключишь с деньгами новый договор и назовёшь цель, к которой вы теперь идёте вместе.</li></ul>
+<p style="margin:0 0 6px">Эта практика сама по себе запускает перемены в деньгах. А курс закрепляет их действиями.</p>
+<span class="gtm">Подарок сохраняется ещё: <b>${giftTxt()}</b></span></div>
+<p style="text-align:center;margin:14px 0 0">Всё это — <b style="color:var(--gold);font-size:22px">${DVP} тг</b><br><span class="dim" style="font-size:15px">Посчитай, сколько денег незаметно ушло мимо тебя только за этот месяц.</span></p>
+${payBtn("dv","Забрать Денежный Взлёт · "+DVP+" тг","glow")}
+<p class="dim giftnote" style="text-align:center;font-size:14px;margin:0 0 10px"${gOn?"":" hidden"}>Не готова сейчас? Подарок держится 24 часа. Можно вернуться по этой же ссылке.</p>
+<details style="margin:0 0 14px"><summary>Сомневаешься? Ответы на главные вопросы</summary>
+<p style="margin:10px 0 6px"><b>«У меня долги, мне не до курсов».</b><br>Именно поэтому. Курс начинается со списка долгов и плана, как их закрыть. ${DVP} тг обычно меньше одного платежа по кредиту.</p>
+<p style="margin:0 0 6px"><b>«Нет времени».</b><br>Около 3 часов на весь курс, в своём темпе. Один урок — одно действие.</p>
+<p style="margin:0 0 6px"><b>«Я уже пробовала вести учёт, не получилось».</b><br>Здесь не просто таблица. Ты работаешь и с цифрами, и с тем, что внутри не даёт деньгам остаться.</p>
+<p style="margin:0"><b>«А вдруг это не для меня?»</b><br>Ты только что увидела в игре, почему деньги проходят мимо. Курс — это первый шаг, чтобы они начали приходить к тебе.</p></details></div>`;
+return rsHead()+`<h2 style="text-align:center">Твой первый шаг на своё место</h2>
+${S.ask.trim()?`<div class="box">Ты написала в начале: <i>«${esc(S.ask.trim())}»</i>.<br>Дело не в том, что ты мало стараешься. Ты стоишь не на своём месте, и поэтому деньги идут мимо. Вернуть себе свои деньги — самый быстрый первый шаг.</div>`:""}
+<p style="text-align:center">Ты уже увидела главное. Теперь первый шаг. Начнём с денег: в них быстрее всего видно, где ты не на своём месте.</p>
+${mainCTA}
+<div style="border-top:1px solid var(--bord);margin-top:22px;padding-top:12px;font-size:14px;line-height:1.7" class="dim"><b style="color:var(--tx)">А дальше — глубже</b>
+<div><a href="${waLink("Здравствуйте, Венера! Я прошла игру «Своё место». Расскажите, пожалуйста, о Квантовом Взлёте. Мой код: "+code)}" target="_blank" rel="noopener" style="color:var(--gold)">Квантовый Взлёт — 3 месяца со мной</a></div>
+<div><a href="${waLink("Здравствуйте, Венера! Я прошла игру «Своё место» и хочу на разбор. Мой код: "+code)}" target="_blank" rel="noopener" style="color:var(--gold)">Личный разбор</a></div>
+<div>Бесплатная группа «Пространство Трансформации»: <a href="https://chat.whatsapp.com/JdXSf1uFlpwJZwUWBv8GbR" target="_blank" rel="noopener" style="color:var(--gold)">WhatsApp</a> · <a href="https://t.me/+2v5c8znsaONjY2Fi" target="_blank" rel="noopener" style="color:var(--gold)">Telegram</a></div></div>
+<details class="box" style="margin-top:16px"><summary>Моя расшифровка текстом</summary><div class="res" style="margin-top:10px">${esc(text)}</div></details>
 <button class="btn ghost" onclick="rsGo(1)">← Назад</button>
-${left()>0?`<button class="btn ghost" onclick="restart()">Пройти заново (осталось попыток: ${left()})</button>`:""}`+CR}
+${left()>0?`<button class="btn ghost" onclick="restart()">Пройти заново (осталось попыток: ${left()})</button>`:""}
+<div class="note" style="margin-top:14px">Это не диагноз, а карта: сигнал, а не приговор.</div>`+CR}
 function flipLife(b){const A=document.getElementById("lifeA"),B=document.getElementById("lifeB"),c=document.getElementById("lifecap");const sh=B.hidden;A.hidden=sh;B.hidden=!sh;B.classList.add("fade");A.classList.add("fade");c.dataset.o=c.dataset.o||c.textContent;c.textContent=sh?"Так выглядит своё место: мама, папа и предки за спиной, а впереди твоя жизнь — деньги, дело, дети, партнёр рядом.":c.dataset.o;b.textContent=sh?"Вернуть, как сейчас":"Покажи, как может быть";vib(20);chime(sh?880:440,.08)}
 function unlock(b){b.classList.remove("shake");void b.offsetWidth;b.classList.add("shake","open");vib([15,30,15]);chime(330,.08)}
 function restart(){Object.assign(S,S0());delete MEM.cur;LSset(MEM);render();window.scrollTo(0,0)}
