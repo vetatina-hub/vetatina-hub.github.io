@@ -1,0 +1,68 @@
+<!doctype html><html lang=ru><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,user-scalable=no"><title>Собери слово — подарок от Огненной Козы</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;800;900&family=Playfair+Display:ital,wght@1,700&display=swap" rel=stylesheet>
+<style>*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:Montserrat,sans-serif;color:#fff;background:#140406;min-height:100vh;overflow-x:hidden}
+#bg{position:fixed;inset:0;background-size:cover;background-position:center;filter:brightness(.45) blur(2px);transform:scale(1.05)}
+.wrap{position:relative;max-width:440px;margin:auto;padding:14px 16px 30px;min-height:100vh;display:flex;flex-direction:column}
+.top{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:14px}
+.top b{background:#e3121b;border-radius:10px;padding:4px 10px}
+.bar{height:8px;background:rgba(255,255,255,.2);border-radius:8px;margin:10px 0 4px;overflow:hidden}.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ffb800,#e3121b);transition:width .5s}
+.steps{display:flex;justify-content:space-between;font-size:11px;font-weight:700;opacity:.8}
+h1{font-family:'Playfair Display',serif;font-style:italic;font-size:27px;line-height:1.15;margin:22px 0 6px;text-shadow:0 3px 12px #000}
+.q{font-weight:700;font-size:17px;background:rgba(0,0,0,.45);border-radius:14px;padding:12px 14px;margin:12px 0 18px}
+.slots,.tiles{display:flex;flex-wrap:wrap;justify-content:center;gap:7px}
+.slot{width:40px;height:50px;border-radius:10px;background:rgba(255,255,255,.14);border:2px dashed rgba(255,255,255,.45);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:24px}
+.slot.f{background:#fff;color:#111;border:2px solid #fff}.slots.ok .slot{background:#25d366;color:#fff;border-color:#25d366}
+.slots.bad{animation:sh .35s}@keyframes sh{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.tiles{margin-top:26px}.tile{width:48px;height:56px;border-radius:12px;background:linear-gradient(#fff,#ffe9c2);color:#7a0007;font-weight:900;font-size:26px;display:flex;align-items:center;justify-content:center;box-shadow:0 5px 0 #b8860b,0 8px 16px rgba(0,0,0,.4);cursor:pointer;user-select:none}
+.tile.u{visibility:hidden}.tile:active{transform:translateY(3px);box-shadow:0 2px 0 #b8860b}
+.row{display:flex;gap:10px;justify-content:center;margin-top:22px}.sm{background:rgba(255,255,255,.15);border:0;color:#fff;font:700 14px Montserrat;border-radius:12px;padding:10px 16px}
+.btn{display:block;width:100%;text-align:center;background:#25d366;color:#fff;font:900 18px Montserrat;border:0;border-radius:16px;padding:16px;text-decoration:none;margin-top:14px;box-shadow:0 8px 24px rgba(37,211,102,.4)}
+.start{background:#e3121b;box-shadow:0 8px 24px rgba(227,18,27,.5)}
+#intro,#win{position:fixed;inset:0;z-index:5;display:flex;flex-direction:column;justify-content:flex-end;padding:20px;background-size:cover;background-position:center top}
+#intro::before,#win::before{content:'';position:absolute;inset:0;background:linear-gradient(transparent 35%,rgba(20,4,6,.95) 70%)}
+#intro>*,#win>*{position:relative;max-width:440px;width:100%;margin-left:auto;margin-right:auto}
+.card{background:rgba(40,10,10,.85);border:2px solid #d4a24c;border-radius:18px;padding:16px;margin-top:10px}
+.card small{color:#d4a24c;font-weight:700;font-size:12px}.card h2{font-size:24px;font-weight:900;margin:4px 0}.code{font-weight:900;letter-spacing:2px;color:#ffd76a}
+.note{font-size:11px;opacity:.7;text-align:center;margin-top:10px}#win{display:none}
+.toast{position:fixed;left:50%;top:40%;transform:translate(-50%,-50%) scale(.6);opacity:0;background:#fff;color:#e3121b;font-weight:900;font-size:26px;padding:14px 26px;border-radius:18px;transition:.3s;z-index:9;pointer-events:none}.toast.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
+</style></head><body><div id=bg></div>
+<div id=intro><h1 id=it></h1><p style="font-weight:600;line-height:1.4;margin:8px 0">Отгадай 3 слова — и Огненная Коза, символ 2027 года, вручит тебе подарок 🎁</p><button class="btn start" onclick="go()">Играть</button><p class=note>Демо для бизнеса: такая игра с вашим фото и подарками за 24 часа</p></div>
+<div class=wrap id=game><div class=top><span id=shop></span><b id=cnt>1 / 3</b></div><div class=bar><i id=pb></i></div><div class=steps><span>Слово 1</span><span>Слово 2</span><span>Слово 3 · подарок</span></div>
+<h1 id=gt>Собери слово</h1><div class=q id=q></div><div class=slots id=slots></div><div class=tiles id=tiles></div>
+<div class=row><button class=sm onclick="undo()">⌫ Стереть</button><button class=sm onclick="hint()">💡 Подсказка</button></div></div>
+<div id=win><h1 style="font-size:30px">Слова собраны!<br>Подарок ваш</h1><div class=card><small>Огненная Коза дарит вам</small><h2 id=prize></h2><div>Код: <span class=code id=code></span></div><p style="font-size:13px;opacity:.85;margin-top:6px">Покажите экран администратору или напишите в WhatsApp. Действует до 15 января.</p></div>
+<a class=btn id=wa target=_blank>Забрать подарок в WhatsApp</a><p class=note>Демо для бизнеса: такая игра с вашим логотипом и подарками за 24 часа. WhatsApp: <a style="color:#25d366" href="https://wa.me/77781436982?text=%D0%94%D0%95%D0%9C%D0%9E">+7 778 143 69 82</a></p></div>
+<div class=toast id=toast></div>
+<script>
+const T={
+pizza:{shop:'Ваша пиццерия',img:'',bg:'linear-gradient(160deg,#a8320f,#2b0703)',title:'Огненная Коза спрятала подарок в пиццерии',words:[['ПИЦЦА','Круглая, горячая, с сыром — наше главное блюдо'],['СЫР','Без него пицца не тянется'],['ДЕСЕРТ','Сладкое после ужина']],prize:'Пицца Маргарита в подарок к заказу'},
+nails:{shop:'Ваш салон',img:'nails.jpg',title:'Огненная Коза спрятала подарок в салоне',words:[['ЛАК','Чем покрывают ногти'],['ФРЕНЧ','Классика с белым кончиком'],['МАНИКЮР','Главная услуга салона']],prize:'Френч в подарок к маникюру'},
+coffee:{shop:'Ваша кофейня',img:'coffee.jpg',title:'Огненная Коза спрятала подарок в кофейне',words:[['ЛАТТЕ','Кофе с большим количеством молока'],['ПЕНКА','Белая шапочка на капучино'],['КАПУЧИНО','Самый популярный кофе зимой']],prize:'Второй кофе бесплатно'},
+barber:{shop:'Ваш барбершоп',img:'barber.jpg',title:'Огненная Коза спрятала подарок в барбершопе',words:[['БРИТВА','Инструмент для гладкого бритья'],['БОРОДА','Её стригут и укладывают'],['УКЛАДКА','Последний штрих после стрижки']],prize:'Укладка в подарок к стрижке'},
+kids:{shop:'Ваш детский центр',img:'dino.jpg',title:'Огненная Коза спрятала подарок в детском центре',words:[['ИГРА','Чем занимаются дети в центре'],['ШАРИК','Надувной и летает'],['ПРАЗДНИК','День рождения у нас — это…']],prize:'Аквагрим в подарок на празднике'}};
+const P=new URLSearchParams(location.search),key=(location.hash.slice(1)||P.get('t')||'pizza'),t=T[key]||T.pizza;
+if(P.get('brand'))t.shop=P.get('brand');if(P.get('prize'))t.prize=P.get('prize');const wa=(P.get('wa')||'77781436982').replace(/\D/g,'');
+const bg=document.getElementById('bg');bg.style.background=t.img?`url(${t.img}) center/cover`:t.bg;
+const intro=document.getElementById('intro');intro.style.backgroundImage='url(goat.jpg)';document.getElementById('it').textContent=t.title;
+document.getElementById('shop').textContent=t.shop;
+let wi=0,word,filled=[],used=[];
+function go(){intro.style.display='none';load()}
+function shuffle(a){a=a.slice();do{for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}}while(a.join('')===word&&a.length>1);return a}
+let letters=[];
+function load(){word=t.words[wi][0];document.getElementById('q').textContent='💬 '+t.words[wi][1];document.getElementById('cnt').textContent=(wi+1)+' / 3';
+letters=shuffle(word.split(''));filled=[];used=[];draw()}
+function draw(){const s=document.getElementById('slots');s.className='slots';s.innerHTML=word.split('').map((_,i)=>`<div class="slot ${filled[i]!=null?'f':''}">${filled[i]!=null?letters[filled[i]]:''}</div>`).join('');
+document.getElementById('tiles').innerHTML=letters.map((l,i)=>`<div class="tile ${used.includes(i)?'u':''}" onclick="pick(${i})">${l}</div>`).join('')}
+function pick(i){if(used.includes(i)||filled.length>=word.length)return;filled.push(i);used.push(i);draw();if(filled.length===word.length)check()}
+function undo(){if(!filled.length)return;used.splice(used.indexOf(filled.pop()),1);draw()}
+function hint(){const k=filled.length;if(k>=word.length)return;const i=letters.findIndex((l,j)=>l===word[k]&&!used.includes(j));
+// if previous letters wrong, reset first
+if(filled.map(f=>letters[f]).join('')!==word.slice(0,k)){filled=[];used=[];draw();return hint()}if(i>=0)pick(i)}
+function toast(x){const e=document.getElementById('toast');e.textContent=x;e.classList.add('on');setTimeout(()=>e.classList.remove('on'),900)}
+function check(){const s=document.getElementById('slots');if(filled.map(f=>letters[f]).join('')===word){s.classList.add('ok');wi++;document.getElementById('pb').style.width=(wi/3*100)+'%';toast(['Отлично!','Ещё одно!','Подарок!'][wi-1]);
+setTimeout(()=>wi<3?load():win(),1000)}else{s.classList.add('bad');setTimeout(()=>{filled=[];used=[];draw()},450)}}
+function win(){const code='NY27-'+(1000+Math.random()*9000|0);document.getElementById('prize').textContent=t.prize;document.getElementById('code').textContent=code;
+const w=document.getElementById('win');w.style.backgroundImage='url(goatgift.jpg)';w.style.display='flex';
+document.getElementById('wa').href=`https://wa.me/${wa}?text=`+encodeURIComponent(`Здравствуйте! Я выиграл(а) в игре «Собери слово»: ${t.prize}. Код ${code}`)}
+</script></body></html>
