@@ -1,0 +1,72 @@
+<!doctype html><html lang=ru><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,user-scalable=no"><title>Выбери ёлочный шар — узнай свою зиму</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&display=swap" rel=stylesheet><style>*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}body{font-family:Montserrat,sans-serif;color:#fff;overflow:hidden;background:var(--c2)}
+#bgc{position:fixed;inset:0;background:radial-gradient(120% 80% at 50% 0%,var(--c1),var(--c2) 70%)}
+#sn{position:fixed;inset:0;pointer-events:none}
+.wrap{position:relative;max-width:460px;height:100%;margin:auto;padding:18px 18px 24px;display:flex;flex-direction:column}
+.top{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:15px}
+.top b{background:#fff;color:var(--c2);border-radius:10px;padding:5px 11px;font-weight:900}
+h1{font-weight:900;font-size:30px;line-height:1.08;margin:16px 0 6px;text-shadow:0 4px 18px rgba(0,0,0,.35)}
+h1 span{background:#fff;color:var(--c1);padding:0 10px;border-radius:10px;display:inline-block;margin-top:4px}
+.sub{font-weight:700;font-size:16px;opacity:.92;margin-bottom:14px;line-height:1.35}
+.btn{display:block;width:100%;text-align:center;background:#25d366;color:#fff;font:900 19px Montserrat;border:0;border-radius:18px;padding:17px;text-decoration:none;box-shadow:0 10px 26px rgba(0,0,0,.35);cursor:pointer}
+.btn.w{background:#fff;color:var(--c2)}.btn.y{background:#ffd23f;color:#3a1a00}
+#win{position:fixed;inset:0;z-index:20;display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px;background:radial-gradient(circle at 50% 35%,var(--c1),var(--c2) 75%)}
+#win .gift{font-size:130px;line-height:1}
+#win h2{font-weight:900;font-size:34px;text-align:center;margin:14px 0 4px}
+.card{background:#fff;color:#1a1a1a;border-radius:22px;padding:18px;width:100%;max-width:420px;margin:14px 0;text-align:center;box-shadow:0 14px 40px rgba(0,0,0,.35)}
+.card small{font-weight:800;color:var(--c1);font-size:13px;text-transform:uppercase;letter-spacing:.06em}.card h3{font-weight:900;font-size:25px;margin:6px 0}
+.code{font-weight:900;letter-spacing:2px;color:var(--c1);font-size:20px}.card p{font-size:13px;opacity:.7;margin-top:6px}
+#win .btn{max-width:420px}.note{font-size:11px;opacity:.75;text-align:center;margin-top:12px;max-width:420px}.note a{color:#fff}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:30}
+#finger{position:fixed;z-index:40;font-size:46px;pointer-events:none;display:none;filter:drop-shadow(0 4px 6px rgba(0,0,0,.5))}
+.toast{position:fixed;left:50%;top:42%;z-index:35;background:#fff;color:var(--c1);font-weight:900;font-size:26px;padding:14px 26px;border-radius:18px;opacity:0;pointer-events:none;white-space:nowrap;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+</style></head><body>
+<div id=bgc></div><canvas id=sn></canvas>
+<style>.balls{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:10px 0}
+.ball{aspect-ratio:1;border-radius:50%;position:relative;cursor:pointer;box-shadow:0 16px 30px rgba(0,0,0,.35),inset -14px -18px 30px rgba(0,0,0,.35),inset 14px 16px 30px rgba(255,255,255,.35)}
+.ball::before{content:'';position:absolute;left:50%;top:-14px;width:30px;height:20px;margin-left:-15px;background:linear-gradient(#ffe9a8,#b8860b);border-radius:6px 6px 3px 3px}
+.ball::after{content:'';position:absolute;left:22%;top:16%;width:26%;height:18%;border-radius:50%;background:rgba(255,255,255,.65);filter:blur(2px)}
+.res{display:none;background:#fff;color:#222;border-radius:22px;padding:20px;margin-top:6px}.res h3{font-weight:900;font-size:24px;color:var(--c1);margin-bottom:8px}.res p{font-weight:600;font-size:16px;line-height:1.4}
+.res .btn{margin-top:14px}</style><div class=wrap><div class=top><span class=shop></span><b>✨ Тест</b></div>
+<h1>Выбери ёлочный шар —<br><span>узнай свою зиму</span></h1><div class=sub id=ts>Не думай долго: какой шар тебе нравится больше?</div>
+<div class=balls id=bl></div><div class=res id=rs><h3 id=rt></h3><p id=rp></p><button class=btn id=rb>🎁 Забрать подарок</button></div></div>
+<div id=win><div class=gift>🎁</div><h2 id=wt></h2><div class=card><small class=shop></small><h3 id=prize></h3><div>Код: <span class=code id=code></span></div><p>Покажите экран администратору или напишите в WhatsApp. Действует до 15 января.</p></div>
+<a class=btn id=wa target=_blank>Забрать подарок в WhatsApp</a><p class=note>Демо для бизнеса: такая игра с вашим логотипом и подарками за 24 часа · <a href="https://wa.me/77781436982?text=%D0%94%D0%95%D0%9C%D0%9E">WhatsApp +7 778 143 69 82</a></p></div>
+<canvas id=fx></canvas><div id=finger>👆</div><div class=toast></div>
+<script>
+const TH={"pizza": {"shop": "Ваша пиццерия", "e": "🍕", "c1": "#ff5a1f", "c2": "#7a1004", "prize": "Пицца в подарок к заказу"}, "salon": {"shop": "Ваш салон", "e": "💅", "c1": "#ff3d8b", "c2": "#4a0626", "prize": "Френч в подарок к маникюру"}, "coffee": {"shop": "Ваша кофейня", "e": "☕", "c1": "#c47a2c", "c2": "#2a1206", "prize": "Второй кофе бесплатно"}, "barber": {"shop": "Ваш барбершоп", "e": "💈", "c1": "#2f7bff", "c2": "#06163a", "prize": "Укладка в подарок к стрижке"}};const P=new URLSearchParams(location.search);const KEY=(location.hash.slice(1)||'coffee');const t=Object.assign({},TH[KEY]||TH['coffee']);
+if(P.get('brand'))t.shop=P.get('brand');if(P.get('prize'))t.prize=P.get('prize');const WA=(P.get('wa')||'77781436982').replace(/\D/g,'');const AUTO=P.has('auto');
+document.documentElement.style.setProperty('--c1',t.c1);document.documentElement.style.setProperty('--c2',t.c2);
+document.querySelectorAll('.shop').forEach(e=>e.textContent=t.shop);
+const $=s=>document.querySelector(s);
+function anim(ms,fn,done){const s=performance.now();(function f(){let k=Math.min(1,(performance.now()-s)/ms);fn(k);k<1?requestAnimationFrame(f):done&&done()})()}
+const ease=k=>1-Math.pow(1-k,3),back=k=>{const c=1.7;return 1+(c+1)*Math.pow(k-1,3)+c*Math.pow(k-1,2)};
+function toast(x){const e=$('.toast');e.textContent=x;anim(900,k=>{const a=k<.2?k/.2:k>.75?(1-k)/.25:1;e.style.opacity=a;e.style.transform=`translate(-50%,-50%) scale(${.7+.3*Math.min(1,k*5)})`})}
+function shake(el){anim(400,k=>el.style.transform=`translateX(${Math.sin(k*Math.PI*6)*9*(1-k)}px)`)}
+function pop(el){anim(350,k=>el.style.transform=`scale(${.6+.4*back(k)})`)}
+// snow
+(function(){const c=$('#sn'),x=c.getContext('2d');let fl=[];function rs(){c.width=innerWidth;c.height=innerHeight;fl=Array.from({length:45},()=>({x:Math.random()*c.width,y:Math.random()*c.height,r:1+Math.random()*2.5,v:.3+Math.random()*.7}))}rs();
+(function f(){x.clearRect(0,0,c.width,c.height);x.fillStyle='rgba(255,255,255,.7)';for(const p of fl){p.y+=p.v;p.x+=Math.sin(p.y/30)*.3;if(p.y>c.height){p.y=-5}x.beginPath();x.arc(p.x,p.y,p.r,0,7);x.fill()}requestAnimationFrame(f)})()})();
+function confetti(){const c=$('#fx'),x=c.getContext('2d');c.width=innerWidth;c.height=innerHeight;const cols=['#ffd23f','#ff3d8b','#25d366','#2f7bff','#fff','#ff5a1f'];
+const ps=Array.from({length:140},()=>({x:c.width/2,y:c.height*.35,vx:(Math.random()-.5)*14,vy:-Math.random()*14-4,r:Math.random()*6.3,s:5+Math.random()*7,c:cols[Math.random()*6|0]}));
+anim(3200,k=>{x.clearRect(0,0,c.width,c.height);for(const p of ps){p.vy+=.35;p.x+=p.vx;p.y+=p.vy;p.vx*=.99;p.r+=.15;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.globalAlpha=1-k*.6;x.fillStyle=p.c;x.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);x.restore()}},()=>x.clearRect(0,0,c.width,c.height))}
+function win(title){const code='NY27-'+(1000+Math.random()*9000|0);$('#wt').textContent=title||'Подарок ваш!';$('#prize').textContent=t.prize;$('#code').textContent=code;
+$('#wa').href=`https://wa.me/${WA}?text=`+encodeURIComponent(`Здравствуйте! Я выиграл(а) в игре: ${t.prize}. Код ${code}`);
+const w=$('#win');w.style.display='flex';anim(500,k=>w.style.opacity=k);const g=$('#win .gift');anim(900,k=>g.style.transform=`scale(${back(k)}) rotate(${Math.sin(k*12)*10*(1-k)}deg)`);confetti()}
+// автодемо для роликов
+const F=$('#finger');function tap(el,cb){if(typeof el==='string')el=$(el);const r=el.getBoundingClientRect();const tx=r.left+r.width/2-8,ty=r.top+r.height/2-4;F.style.display='block';
+const sx=parseFloat(F.style.left)||tx+60,sy=parseFloat(F.style.top)||ty+160;anim(420,k=>{const e=ease(k);F.style.left=(sx+(tx-sx)*e)+'px';F.style.top=(sy+(ty-sy)*e)+'px'},()=>{anim(160,k=>F.style.transform=`scale(${1-.25*Math.sin(k*Math.PI)})`);el.dispatchEvent(new MouseEvent('click',{bubbles:true}));cb&&setTimeout(cb,10)})}
+function seq(steps){let i=0;(function n(){if(i>=steps.length){F.style.display='none';return}const [ms,f]=steps[i++];setTimeout(()=>{f();n()},ms)})()}
+
+
+const B=[['radial-gradient(circle at 35% 30%,#ff6b6b,#b30012)','Зима ярких встреч','Вас ждут шумные праздники, новые знакомства и много поводов надеть лучшее платье.'],
+['radial-gradient(circle at 35% 30%,#fff1a8,#c48a00)','Зима исполнения желаний','Самое время загадать главное желание — и порадовать себя заранее.'],
+['radial-gradient(circle at 35% 30%,#8fd3ff,#0b4fa8)','Зима уюта и тепла','Плед, любимые люди и время для себя. Вы заслужили отдых.'],
+['radial-gradient(circle at 35% 30%,#8ff0b0,#0a7a3a)','Зима новых начинаний','Новый год откроет новую дверь. Начните с заботы о себе.']];
+$('#bl').innerHTML=B.map((b,i)=>`<div class=ball id=b${i} style="background:${b[0]}"></div>`).join('');
+B.forEach((b,i)=>$('#b'+i).onclick=()=>{[0,1,2,3].forEach(j=>{if(j!==i)anim(400,k=>$('#b'+j).style.opacity=1-k*.75)});pop($('#b'+i));
+setTimeout(()=>{$('#bl').style.display='none';$('#ts').style.display='none';$('#rt').textContent=b[1];$('#rp').textContent=b[2]+' А от нас — подарок: '+t.prize.toLowerCase()+'.';const r=$('#rs');r.style.display='block';anim(500,k=>{r.style.opacity=k;r.style.transform=`translateY(${(1-ease(k))*30}px)`})},900)});
+$('#rb').onclick=()=>win('Ваша зима начинается с подарка!');
+if(AUTO)seq([[1800,()=>tap('#b1')],[3200,()=>tap('#rb')]])
+</script></body></html>
