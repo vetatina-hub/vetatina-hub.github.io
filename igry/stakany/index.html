@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Сбей стаканчики</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: ярмарочный тир в новогодней кофейне, азарт «ещё один бросок»
+   IDEA: пирамида глянцевых красных стаканчиков на барной стойке, бросаешь золотой снежок
+   PICTURE: живое фото кофейни, на нём настоящие 3D-стаканы с тенями и физикой падения
+   COLOUR and TYPE: ночь #160607, огненный #e3262f, золото #f6c453; Playfair italic + Manrope
+   LAYOUT: экран телефона, HUD сверху, пирамида в центре, бросок пальцем снизу вверх */
+:root{color-scheme:dark;--bg:#160607;--ink:#fff7ec;--muted:#e8cdb8;--fire:#e3262f;--gold:#f6c453}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:16px/1.5 Manrope,system-ui,sans-serif;overflow:hidden}
+.blur{position:fixed;inset:-40px;background:url(coffee.jpg) center/cover;filter:blur(30px) brightness(.4);z-index:0}
+.app{position:relative;z-index:1;height:100dvh;max-width:520px;margin:0 auto;overflow:hidden;background:#000;box-shadow:0 0 60px #0009}
+.photo{position:absolute;inset:0;background:url(coffee.jpg) center 20%/cover;filter:blur(3px) brightness(.8) saturate(1.15);transform:scale(1.06)}
+#cv{position:absolute;inset:0;width:100%;height:100%;touch-action:none;display:block}
+.hud{position:absolute;left:0;right:0;top:0;padding:12px 14px 18px;background:linear-gradient(#0d0304e6,#0d030400);z-index:3;pointer-events:none}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:800}
+.balls{display:flex;gap:5px}
+.balls i{width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0 16%,#ffe39a 30%,#c9861b 75%,#7a4a08);box-shadow:0 0 8px #f6c45399}
+.balls i.off{opacity:.2;filter:grayscale(1)}
+.bar{position:relative;height:12px;border-radius:8px;background:#ffffff26;margin:9px 0 4px;overflow:hidden}
+.fill{height:100%;width:0;background:linear-gradient(90deg,#ff7a3c,var(--gold));border-radius:8px;transition:width .4s;box-shadow:0 0 12px #f6c453}
+.tick{position:absolute;top:-1px;width:2px;height:14px;background:#fff8}
+.lab{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+.toast{position:absolute;left:50%;top:22%;transform:translate(-50%,0) scale(.8);opacity:0;z-index:4;background:linear-gradient(#ff4a3d,#b3121c);border:1px solid #ffd27a;padding:10px 18px;border-radius:16px;font-weight:800;white-space:nowrap;transition:.3s;pointer-events:none;box-shadow:0 8px 30px #e3262f88}
+.toast.on{opacity:1;transform:translate(-50%,0) scale(1)}
+.hint{position:absolute;left:0;right:0;bottom:7%;text-align:center;font-weight:700;z-index:3;pointer-events:none;text-shadow:0 2px 8px #000;opacity:0;transition:.3s;padding:0 20px}
+.hint.on{opacity:1}
+.layer{position:absolute;inset:0;z-index:5;display:none;flex-direction:column;justify-content:flex-end;padding:18px 18px 22px;background:center/cover;overflow-y:auto}
+.layer.on{display:flex;animation:in .45s ease}
+.layer::before{content:"";position:absolute;inset:0;background:linear-gradient(#16060700 15%,#160607d9 55%,#160607 78%);z-index:-1}
+.layer>*{position:relative}
+@keyframes in{from{opacity:0;transform:scale(1.03)}to{opacity:1;transform:none}}
+h1{font:italic 700 clamp(27px,7.4vw,36px)/1.08 'Playfair Display',serif;margin:0 0 10px;text-wrap:balance;text-shadow:0 2px 14px #000}
+.layer p{margin:0 0 12px;color:var(--muted)}
+.tiers{list-style:none;margin:0 0 14px;padding:0;display:grid;gap:5px}
+.tiers li{display:flex;gap:10px;align-items:center;background:#ffffff12;border:1px solid #ffffff1f;border-radius:12px;padding:7px 12px;font-size:14px}
+.tiers b{min-width:58px;color:var(--gold)}
+.btn{display:block;width:100%;min-height:54px;border:0;border-radius:16px;font:800 18px Manrope,sans-serif;color:#fff;cursor:pointer;text-align:center;text-decoration:none;line-height:54px;background:linear-gradient(#ff5145,#c3151f);box-shadow:0 8px 24px #e3262f66,inset 0 1px 0 #ffffff66}
+.btn.wa{background:linear-gradient(#36d66f,#16a34a);box-shadow:0 8px 24px #16a34a55,inset 0 1px 0 #ffffff66}
+.btn:focus-visible,.link:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.link{background:none;border:0;color:var(--gold);font:700 15px Manrope;text-decoration:underline;min-height:44px;cursor:pointer;width:100%}
+.prize{padding:16px;border-radius:20px;border:2px solid var(--gold);background:linear-gradient(#3a0d0fcc,#1e0708cc);margin-bottom:12px;box-shadow:0 0 30px #f6c45333}
+.prize small{color:var(--muted);font-size:13px;display:block}
+.prize strong{display:block;font-size:24px;line-height:1.2;margin:4px 0;color:#fff}
+.prize code{font:800 17px Manrope;color:var(--gold);letter-spacing:1px}
+.demo{font-size:13px;color:var(--muted);text-align:center;margin:10px 0 0}
+.demo a{color:var(--gold)}
+.load{position:absolute;inset:0;z-index:9;display:grid;place-items:center;background:var(--bg);font-weight:700;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){.layer.on{animation:none}}
+</style>
+</head>
+<body>
+<div class="blur"></div>
+<div class="app" id="app">
+  <div class="photo"></div>
+  <canvas id="cv"></canvas>
+  <div class="hud">
+    <div class="top"><span>Ваша кофейня</span><span class="balls" id="balls" aria-label="Снежки"></span></div>
+    <div class="bar" aria-label="Сколько стаканчиков сбито"><div class="fill" id="fill"></div><div class="tick" style="left:30%"></div><div class="tick" style="left:60%"></div></div>
+    <div class="lab"><span id="cnt">Сбито 0 из 10</span><span>3 подарок</span><span>6 сюрприз</span><span>10 главный</span></div>
+  </div>
+  <div class="toast" id="toast"></div>
+  <div class="hint" id="hint">Смахните пальцем вверх к стаканчикам — или просто нажмите туда, куда бросить</div>
+
+  <div class="layer on" id="start" style="background-image:url(goat.jpg)">
+    <h1>Сбейте все стаканчики — заберите праздничный кофе</h1>
+    <p>Огненная Коза построила пирамиду. У вас 3 снежка. Золотой стаканчик даёт ещё один бросок.</p>
+    <ul class="tiers" id="tiers"></ul>
+    <button class="btn" id="play" type="button">Играть</button>
+  </div>
+
+  <div class="layer" id="end" style="background-image:url(goatgift.jpg)">
+    <h1 id="eTitle">Сбито 7 из 10!</h1>
+    <div class="prize"><small>Коза дарит вам</small><strong id="ePrize">—</strong><code id="eCode">NY27-0000</code><small>Покажите этот экран бариста или напишите в WhatsApp. Действует до 10 января.</small></div>
+    <a class="btn wa" id="wa" href="#" target="_blank" rel="noopener">Забрать подарок в WhatsApp</a>
+    <button class="link" id="again" type="button">Сыграть ещё раз и сбить все</button>
+    <p class="demo">Демо для бизнеса: такая игра с вашими стаканами, логотипом и подарками за 24 часа. Сотрудникам ничего делать не нужно. WhatsApp <a href="https://wa.me/77781436982" target="_blank" rel="noopener">+7 778 143 69 82</a></p>
+  </div>
+  <div class="load" id="load">Расставляем стаканчики…</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js"></script>
+<script>
+{
+const WA='77781436982',P=['Сироп в подарок','Второй напиток −50%','Десерт к кофе бесплатно','Напиток + десерт бесплатно'];
+const $=id=>document.getElementById(id);
+$('tiers').innerHTML=[['всем',0],['3 стакана',1],['6 стаканов',2],['все 10',3]].map(([t,i])=>`<li><b>${t}</b><span>${P[i]}</span></li>`).join('');
+if(!window.THREE||!window.CANNON){$('load').textContent='Не удалось загрузить игру. Обновите страницу.';}
+else{
+const T=THREE,CN=CANNON,cv=$('cv'),app=$('app');
+const R=new T.WebGLRenderer({canvas:cv,antialias:true,alpha:true});
+R.setPixelRatio(Math.min(devicePixelRatio||1,2));R.outputEncoding=T.sRGBEncoding;R.toneMapping=T.ACESFilmicToneMapping;R.toneMappingExposure=1.15;
+R.shadowMap.enabled=true;R.shadowMap.type=T.PCFSoftShadowMap;
+const S=new T.Scene(),cam=new T.PerspectiveCamera(40,1,.1,100);
+S.add(new T.HemisphereLight(0xfff1dc,0x3a0b0b,.5));
+const sun=new T.DirectionalLight(0xffe0b0,1.3);sun.position.set(-3,8,5);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);
+Object.assign(sun.shadow.camera,{left:-5,right:5,top:5,bottom:-3,near:1,far:20});S.add(sun);
+const rim=new T.DirectionalLight(0xffb070,.8);rim.position.set(4,3,-4);S.add(rim);
+const M={
+ cup:new T.MeshPhysicalMaterial({color:0xb4000e,metalness:.2,roughness:.14,clearcoat:1,clearcoatRoughness:.04,envMapIntensity:2,side:T.DoubleSide}),
+ gcup:new T.MeshPhysicalMaterial({color:0xffcf6a,emissive:0x3a2200,metalness:1,roughness:.12,clearcoat:.8,envMapIntensity:2.6,side:T.DoubleSide}),
+ cream:new T.MeshPhysicalMaterial({color:0xfff3df,roughness:.3,clearcoat:.6,envMapIntensity:1.2}),
+ gold:new T.MeshPhysicalMaterial({color:0xffcf6a,emissive:0x3a2200,metalness:1,roughness:.12,clearcoat:.8,envMapIntensity:2.6}),
+ ball:new T.MeshPhysicalMaterial({color:0xffe9b8,emissive:0x442a00,metalness:.85,roughness:.1,clearcoat:1,envMapIntensity:2.8}),
+ wood:new T.MeshPhysicalMaterial({color:0x2a1208,roughness:.28,clearcoat:1,clearcoatRoughness:.12,envMapIntensity:1.3})};
+const pm=new T.PMREMGenerator(R);
+new T.TextureLoader().load('coffee.jpg',t=>{t.mapping=T.EquirectangularReflectionMapping;t.encoding=T.sRGBEncoding;const e=pm.fromEquirectangular(t).texture;for(const m of Object.values(M))m.envMap=e,m.needsUpdate=true;$('load').style.display='none';},undefined,()=>{$('load').style.display='none'});
+
+// physics world
+const W=new CN.World();W.gravity.set(0,-9.8,0);W.broadphase=new CN.NaiveBroadphase();W.solver.iterations=20;W.allowSleep=true;
+const mat=new CN.Material('m');W.addContactMaterial(new CN.ContactMaterial(mat,mat,{friction:.45,restitution:.15}));
+// counter
+const TW=5.4,TD=2.2;
+const table=new T.Mesh(new T.BoxGeometry(TW,.3,TD),M.wood);table.position.y=-.15;table.receiveShadow=true;S.add(table);
+const edge=new T.Mesh(new T.BoxGeometry(TW,.06,.06),M.gold);edge.position.set(0,0,TD/2);S.add(edge);
+const tb=new CN.Body({mass:0,material:mat});tb.addShape(new CN.Box(new CN.Vec3(TW/2,.15,TD/2)));tb.position.set(0,-.15,0);W.addBody(tb);
+
+// cup visual (lathe) + physics box
+const CH=.95,CR=.36;
+const prof=[[.27,0],[.3,.02],[.36,.9],[.38,.93],[.37,.95],[.34,.94],[.32,.1],[.0,.06]].map(([x,y])=>new T.Vector2(x,y));
+const cupG=new T.LatheGeometry(prof,40);cupG.translate(0,-CH/2,0);
+const bandG=new T.TorusGeometry(.33,.025,10,40);bandG.rotateX(Math.PI/2);
+const lidG=new T.CylinderGeometry(.345,.345,.03,40);
+let cups=[],ballObj=null,fx=[];
+function makeCup(x,y,gold){
+ const g=new T.Group(),m=new T.Mesh(cupG,gold?M.gcup:M.cup);m.castShadow=m.receiveShadow=true;g.add(m);
+ const band=new T.Mesh(bandG,gold?M.cup:M.gold);band.position.y=.05;g.add(band);
+ const foam=new T.Mesh(lidG,M.cream);foam.position.y=CH/2-.06;g.add(foam);
+ S.add(g);
+ const b=new CN.Body({mass:.35,material:mat,linearDamping:.05,angularDamping:.1});b.addShape(new CN.Box(new CN.Vec3(CR*.92,CH/2,CR*.92)));
+ b.position.set(x,y,0);b.allowSleep=true;b.sleepSpeedLimit=.15;b.sleepTimeLimit=.4;W.addBody(b);b.sleep();
+ return {g,b,gold,sx:x,sy:y,down:false};
+}
+function build(){
+ for(const c of cups){S.remove(c.g);W.removeBody(c.b);}cups=[];
+ const rows=[4,3,2,1],gap=.78,gIdx=Math.floor(Math.random()*6)+3;let n=0;
+ rows.forEach((k,r)=>{for(let i=0;i<k;i++){cups.push(makeCup((i-(k-1)/2)*gap,CH/2+r*(CH+.002),n===gIdx));n++;}});
+}
+// ball
+const bm=new T.Group();const bs=new T.Mesh(new T.SphereGeometry(.26,40,28),M.ball);bs.castShadow=true;bm.add(bs);
+const cap=new T.Mesh(new T.CylinderGeometry(.07,.07,.1,16),M.gold);cap.position.y=.28;bm.add(cap);S.add(bm);
+let body=null;
+const START=new T.Vector3(0,.15,6.0);bm.position.copy(START);
+
+// falling snow
+const sn=new T.BufferGeometry(),SNN=300,sp=new Float32Array(SNN*3);for(let i=0;i<SNN;i++){sp[i*3]=(Math.random()-.5)*14;sp[i*3+1]=Math.random()*9-1;sp[i*3+2]=(Math.random()-.5)*10-1;}
+sn.setAttribute('position',new T.BufferAttribute(sp,3));const snow=new T.Points(sn,new T.PointsMaterial({color:0xffffff,size:.05,transparent:true,opacity:.8}));S.add(snow);
+
+function size(){const w=app.clientWidth,h=app.clientHeight;R.setSize(w,h,false);cam.aspect=w/h;
+ cam.fov=w/h<.6?52:40;cam.position.set(0,2.6,7.6+(w/h<.6?0:-1));cam.lookAt(0,1.35,0);cam.updateProjectionMatrix();}
+new ResizeObserver(size).observe(app);size();
+
+let state='menu',balls=3,flying=false,settleT=0,down=0;
+function ballsUI(){$('balls').innerHTML=Array.from({length:Math.max(3,balls)},(_,i)=>`<i class="${i<balls?'':'off'}"></i>`).join('');}
+function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),1500);}
+function ui(){$('cnt').textContent=`Сбито ${down} из 10`;$('fill').style.width=down*10+'%';}
+function newGame(){build();balls=3;down=0;ui();ballsUI();resetBall();state='play';$('hint').classList.add('on');}
+function resetBall(){if(body){W.removeBody(body);body=null;}bm.position.copy(START);bm.rotation.set(0,0,0);flying=false;}
+
+// aim: tap/swipe end -> point on plane z=0
+const ray=new T.Raycaster(),plane=new T.Plane(new T.Vector3(0,0,1),0);let st=null;
+function toPoint(e){const rc=cv.getBoundingClientRect();const v=new T.Vector2((e.clientX-rc.left)/rc.width*2-1,-(e.clientY-rc.top)/rc.height*2+1);ray.setFromCamera(v,cam);const p=new T.Vector3();ray.ray.intersectPlane(plane,p);return p;}
+cv.addEventListener('pointerdown',e=>{st={x:e.clientX,y:e.clientY,t:performance.now()};});
+cv.addEventListener('pointerup',e=>{if(!st||state!=='play'||flying||balls<=0){st=null;return;}
+ const dy=st.y-e.clientY,dt=Math.max(60,performance.now()-st.t);let p;
+ if(dy>30){// swipe: aim along swipe direction, height by swipe length
+  const rc=cv.getBoundingClientRect(),k=Math.min(1,dy/(rc.height*.45));p=toPoint({clientX:e.clientX+(e.clientX-st.x)*1.2,clientY:rc.top+rc.height*(.62-k*.32)});
+ }else p=toPoint(e);
+ st=null;if(!p)return;throwAt(p);});
+function throwAt(p){
+ p.x+= (Math.random()-.5)*.12;p.y=Math.max(.2,Math.min(4.2,p.y));
+ const t=.62,v=new CN.Vec3((p.x-START.x)/t,(p.y-START.y+.5*9.8*t*t)/t,(0-START.z)/t);
+ body=new CN.Body({mass:1.1,material:mat});body.addShape(new CN.Sphere(.26));body.position.set(START.x,START.y,START.z);body.velocity.copy(v);body.angularVelocity.set(-8,0,0);W.addBody(body);
+ for(const c of cups)c.b.wakeUp();
+ flying=true;settleT=0;balls--;ballsUI();$('hint').classList.remove('on');
+}
+function burst(pos,gold){for(let i=0;i<12;i++){const m=new T.Mesh(new T.OctahedronGeometry(.06,0),i%2?M.gold:(gold?M.gold:M.cup));m.position.copy(pos);S.add(m);fx.push({m,v:new T.Vector3((Math.random()-.5)*4,Math.random()*4+1,(Math.random()-.5)*4),t:0});}}
+function check(){
+ for(const c of cups){if(c.down)continue;const q=c.g.quaternion,up=new T.Vector3(0,1,0).applyQuaternion(q);
+  const moved=Math.hypot(c.b.position.x-c.sx,c.b.position.z)>CR*1.4||c.b.position.y<c.sy-.4;
+  if(up.y<.55||moved||c.b.position.y<-.3){c.down=true;down++;burst(c.g.position,c.gold);
+   if(c.gold){balls++;ballsUI();toast('Золотой стаканчик: +1 снежок!');}}}
+ ui();
+}
+function endTurn(){
+ resetBall();
+ if(down>=10)return finish();
+ if(down>=6&&!endTurn.s6){endTurn.s6=1;toast('Сюрприз открыт! Добейте все');}
+ else if(down>=3&&!endTurn.s3){endTurn.s3=1;toast('Подарок открыт! Дальше — сюрприз');}
+ if(balls<=0)return setTimeout(finish,400);
+ $('hint').classList.add('on');
+}
+function finish(){if(state==='end')return;state='end';$('hint').classList.remove('on');
+ const tier=down>=10?3:down>=6?2:down>=3?1:0,prize=P[tier],code='NY27-'+Math.floor(1000+Math.random()*9000);
+ $('eTitle').textContent=down>=10?'Все стаканчики сбиты! Главный приз ваш':`Сбито ${down} из 10!`;
+ $('ePrize').textContent=prize;$('eCode').textContent=code;
+ $('wa').href='https://wa.me/'+WA+'?text='+encodeURIComponent(`Здравствуйте! Я сыграл(а) в «Сбей стаканчики» и выиграл(а): ${prize}. Код ${code}. Хочу забрать подарок!`);
+ $('again').style.display=down>=10?'none':'';setTimeout(()=>$('end').classList.add('on'),700);}
+
+let last=performance.now();
+function loop(now){const dt=Math.min(.033,(now-last)/1000);last=now;
+ W.step(1/120,dt,4);
+ for(const c of cups){c.g.position.copy(c.b.position);c.g.quaternion.copy(c.b.quaternion);}
+ if(body){bm.position.copy(body.position);bm.quaternion.copy(body.quaternion);}
+ if(state==='play'){check();
+  if(flying){settleT+=dt;const still=cups.every(c=>c.b.sleepState===CN.Body.SLEEPING||c.b.velocity.length()<.25);
+   if(settleT>3.2||(settleT>1.6&&still)){endTurn.s3=endTurn.s3||0;endTurn();}}
+  else{bm.position.y=START.y+Math.sin(now/300)*.05;bm.rotation.y+=dt;}}
+ for(let i=fx.length-1;i>=0;i--){const f=fx[i];f.t+=dt;f.v.y-=9*dt;f.m.position.addScaledVector(f.v,dt);f.m.rotation.x+=dt*8;f.m.scale.setScalar(Math.max(0,1-f.t));if(f.t>1){S.remove(f.m);fx.splice(i,1);}}
+ const a=sn.attributes.position.array;for(let i=0;i<SNN;i++){a[i*3+1]-=dt*.5;if(a[i*3+1]<-1)a[i*3+1]=8;}sn.attributes.position.needsUpdate=true;
+ R.render(S,cam);requestAnimationFrame(loop);}
+build();ballsUI();requestAnimationFrame(loop);
+$('play').onclick=()=>{$('start').classList.remove('on');endTurn.s3=endTurn.s6=0;newGame();};
+$('again').onclick=()=>{$('end').classList.remove('on');endTurn.s3=endTurn.s6=0;newGame();};
+}
+}
+</script>
+</body>
+</html>

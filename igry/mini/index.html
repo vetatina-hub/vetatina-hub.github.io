@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Новогодние игры</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: смешные новогодние мини-игры на 15–30 секунд, хочется переслать другу
+   IDEA: живое фото героя — побрить Деда Мороза, почистить зубы Снеговику, накрасить ногти
+   PICTURE: фото во весь экран, золотая бритва / щётка / кисть под пальцем, искры и пена
+   COLOUR and TYPE: ночь #160607, огненный #e3262f, золото #f6c453; Playfair italic + Manrope
+   LAYOUT: экран телефона, таймер и шкала сверху, поле игры — само фото */
+:root{color-scheme:dark;--bg:#160607;--ink:#fff7ec;--muted:#e8cdb8;--fire:#e3262f;--gold:#f6c453}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:16px/1.5 Manrope,system-ui,sans-serif;overflow:hidden}
+.blur{position:fixed;inset:-40px;background:center/cover;filter:blur(30px) brightness(.4);z-index:0}
+.app{position:relative;z-index:1;height:100dvh;max-width:520px;margin:0 auto;overflow:hidden;background:#000;box-shadow:0 0 60px #0009}
+.app canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+#fx{touch-action:none;cursor:none}
+.hud{position:absolute;left:0;right:0;top:0;padding:12px 14px 16px;z-index:3;pointer-events:none;background:linear-gradient(#0d0304ee,#0d030400)}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:800}
+.timer{display:flex;align-items:baseline;gap:4px;background:linear-gradient(#ff5145,#b3121c);padding:2px 12px;border-radius:12px;border:1px solid #ffd27a}
+.timer b{font-size:20px}.timer small{font-size:12px;color:#ffe3c8}
+.bar{position:relative;height:12px;border-radius:8px;background:#ffffff26;margin:9px 0 4px;overflow:hidden}
+.fill{height:100%;width:0;background:linear-gradient(90deg,#ff7a3c,var(--gold));border-radius:8px;transition:width .2s;box-shadow:0 0 12px #f6c453}
+.tick{position:absolute;top:-1px;width:2px;height:14px;background:#fff8}
+.lab{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+.sample{display:none;align-items:center;gap:6px;margin-top:8px;font-size:13px;color:var(--muted)}
+.sample.on{display:flex}
+.sample i{width:18px;height:26px;border-radius:50% 50% 45% 45%;border:1px solid #fff6;box-shadow:inset -3px -4px 6px #0005,inset 3px 3px 4px #fff7}
+.palette{position:absolute;left:0;right:0;bottom:16px;display:none;justify-content:center;gap:14px;z-index:3}
+.palette.on{display:flex}
+.palette button{width:54px;height:54px;border-radius:50%;border:3px solid #ffffff55;cursor:pointer;box-shadow:inset -6px -8px 12px #0006,inset 6px 6px 10px #fff8,0 6px 16px #0008}
+.palette button.cur{border-color:var(--gold);transform:scale(1.15);box-shadow:inset -6px -8px 12px #0006,inset 6px 6px 10px #fff8,0 0 18px #f6c453}
+.toast{position:absolute;left:50%;top:20%;transform:translate(-50%,0) scale(.8);opacity:0;z-index:4;background:linear-gradient(#ff4a3d,#b3121c);border:1px solid #ffd27a;padding:10px 18px;border-radius:16px;font-weight:800;white-space:nowrap;transition:.3s;pointer-events:none;box-shadow:0 8px 30px #e3262f88}
+.toast.on{opacity:1;transform:translate(-50%,0) scale(1)}
+.hint{position:absolute;left:0;right:0;bottom:12%;text-align:center;font-weight:700;z-index:3;pointer-events:none;text-shadow:0 2px 8px #000;transition:.3s;padding:0 20px}
+.hint.off{opacity:0}
+.layer{position:absolute;inset:0;z-index:5;display:none;flex-direction:column;justify-content:flex-end;padding:18px 18px 22px;background:center/cover;overflow-y:auto}
+.layer.on{display:flex;animation:in .45s ease}
+.layer::before{content:"";position:absolute;inset:0;background:linear-gradient(#16060700 15%,#160607d9 55%,#160607 78%);z-index:-1}
+.layer>*{position:relative}
+@keyframes in{from{opacity:0;transform:scale(1.03)}to{opacity:1;transform:none}}
+h1{font:italic 700 clamp(27px,7.4vw,36px)/1.08 'Playfair Display',serif;margin:0 0 10px;text-wrap:balance;text-shadow:0 2px 14px #000}
+.layer p{margin:0 0 12px;color:var(--muted)}
+.tiers{list-style:none;margin:0 0 14px;padding:0;display:grid;gap:5px}
+.tiers li{display:flex;gap:10px;align-items:center;background:#ffffff12;border:1px solid #ffffff1f;border-radius:12px;padding:7px 12px;font-size:14px}
+.tiers b{min-width:58px;color:var(--gold)}
+.btn{display:block;width:100%;min-height:54px;border:0;border-radius:16px;font:800 18px Manrope,sans-serif;color:#fff;cursor:pointer;text-align:center;text-decoration:none;line-height:54px;background:linear-gradient(#ff5145,#c3151f);box-shadow:0 8px 24px #e3262f66,inset 0 1px 0 #ffffff66}
+.btn.wa{background:linear-gradient(#36d66f,#16a34a);box-shadow:0 8px 24px #16a34a55,inset 0 1px 0 #ffffff66}
+.btn:focus-visible,.link:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.link{background:none;border:0;color:var(--gold);font:700 15px Manrope;text-decoration:underline;min-height:44px;cursor:pointer;width:100%}
+.prize{padding:16px;border-radius:20px;border:2px solid var(--gold);background:linear-gradient(#3a0d0fcc,#1e0708cc);margin-bottom:12px;box-shadow:0 0 30px #f6c45333}
+.prize small{color:var(--muted);font-size:13px;display:block}
+.prize strong{display:block;font-size:24px;line-height:1.2;margin:4px 0;color:#fff}
+.prize code{font:800 17px Manrope;color:var(--gold);letter-spacing:1px}
+.demo{font-size:13px;color:var(--muted);text-align:center;margin:10px 0 0}
+.demo a{color:var(--gold)}
+.niches{display:flex;gap:8px;justify-content:center;margin-top:10px;flex-wrap:wrap}
+.niches a{font-size:13px;color:var(--ink);padding:7px 13px;border-radius:20px;background:#ffffff1a;text-decoration:none}
+.niches a.cur{background:var(--gold);color:#2a0708;font-weight:800}
+@media (prefers-reduced-motion:reduce){.layer.on{animation:none}}
+</style>
+</head>
+<body>
+<div class="blur" id="blur"></div>
+<div class="app" id="app">
+  <canvas id="bg"></canvas><canvas id="fg"></canvas><canvas id="fm"></canvas><canvas id="fx"></canvas>
+  <div class="hud">
+    <div class="top"><span id="shop">Ваш барбершоп</span><span class="timer"><b id="tm">15</b><small>сек</small></span></div>
+    <div class="bar"><div class="fill" id="fill"></div><div class="tick" id="k1"></div><div class="tick" id="k2"></div></div>
+    <div class="lab" id="lab"></div>
+    <div class="sample" id="sample"><span>Нужный цвет — в кружке над ногтем</span><span id="chips" style="display:none"></span></div>
+  </div>
+  <div class="palette" id="palette"></div>
+  <div class="toast" id="toast"></div>
+  <div class="hint" id="hint"></div>
+
+  <div class="layer on" id="start">
+    <h1 id="sTitle"></h1>
+    <p id="sText"></p>
+    <ul class="tiers" id="tiers"></ul>
+    <button class="btn" id="play" type="button">Играть</button>
+    <div class="niches" id="niches"></div>
+  </div>
+  <div class="layer" id="end" style="background-image:url(goatgift.jpg)">
+    <h1 id="eTitle"></h1>
+    <div class="prize"><small>Огненная Коза дарит вам</small><strong id="ePrize">—</strong><code id="eCode">NY27-0000</code><small>Покажите этот экран администратору или напишите в WhatsApp. Действует до 10 января.</small></div>
+    <a class="btn wa" id="wa" href="#" target="_blank" rel="noopener">Забрать подарок в WhatsApp</a>
+    <button class="link" id="again" type="button">Сыграть ещё раз</button>
+    <p class="demo">Демо для бизнеса: такая игра с вашим логотипом и подарками за 24 часа. Сотрудникам ничего делать не нужно. WhatsApp <a href="https://wa.me/77781436982" target="_blank" rel="noopener">+7 778 143 69 82</a></p>
+  </div>
+</div>
+
+<script>
+{
+const WA='77781436982',$=id=>document.getElementById(id);
+const G={
+ shave:{label:'Барбершоп',shop:'Ваш барбершоп',img:'ded.jpg',name:'Подстриги бороду Деду Морозу',time:25,fit:'cover',zoom:1,fx:.5,fy:.5,
+  title:'Модная борода для Деда Мороза',text:'Дед Мороз пришёл в барбершоп. Шаг 1: взбейте пену помазком. Шаг 2: бритвой сверху вниз уберите всё лишнее за золотым контуром. Заденете усы или контур — порез. За 3 пореза Дед Мороз уйдёт. На всё 25 секунд.',
+  hint:'Шаг 1: нанесите пену помазком на бороду',marks:[50,75,95],p:['Укладка в подарок','Камуфляж бороды −50%','−25% на стрижку','Стрижка бесплатно'],
+  poly:[[37,21],[50,20.5],[63,21],[72,24],[78,30],[83,42],[84,58],[81,75],[75,88],[66,96],[50,98],[34,96],[25,88],[19,75],[16,58],[17,42],[22,30],[28,24]],brush:.075,need:1},
+ smile:{label:'Стоматология',shop:'Ваша клиника',img:'snowman.jpg',name:'Улыбка для Снеговика',time:15,fit:'cover',zoom:1.8,fx:.54,fy:.36,
+  title:'Почистите Снеговику зубы от конфет',text:'Снеговик объелся конфет, и на зубах остался налёт. Трите щёткой туда-сюда, пока зубы не заблестят. Под налётом подарок.',
+  hint:'Трите щёткой по зубам',marks:[40,70,95],p:['Консультация бесплатно','Чек-ап −50%','Профчистка −25%','Профчистка −50%'],
+  poly:[[42.5,32.6],[48,32.1],[55,32],[61,32.2],[65.5,32.8],[64,35.3],[58,36.3],[52,36.5],[46,36.1],[43.5,35]],brush:.032,need:2},
+ nails:{label:'Маникюр',shop:'Ваша студия',img:'hand.jpg',name:'Маникюр для Снегурочки',time:30,fit:'width',fy:.32,
+  title:'Маникюр для Снегурочки за 30 секунд',text:'Повторите образец: выберите цвет и закрасьте ноготь пальцем. Чем больше ногтей совпадёт с образцом, тем больше подарок.',
+  hint:'Выберите цвет внизу и закрашивайте ногти',marks:[60,80,100],p:['Дизайн на 2 ногтя в подарок','−15% на маникюр','−25% на новогодний маникюр','Маникюр с покрытием бесплатно'],
+  nails:[[14.4,31.9,5.6,5.2,-6],[35.8,19.6,6.6,5.8,-3],[50.5,14.2,7,6.2,0],[67,18.4,7,6,4],[88.5,44.5,7.4,5,-20]]}};
+const COLORS=[['Красный','#c0000f','#ff5a5f','#5a0006'],['Золото','#d9a334','#fff0b0','#6b4a08'],['Жемчуг','#efe6da','#ffffff','#a89a88'],['Изумруд','#0b7a45','#5fe0a0','#023a1f']];
+
+let key=(location.hash||'#shave').slice(1);if(!G[key])key='shave';let C=G[key];
+const app=$('app'),bg=$('bg'),fg=$('fg'),fm=$('fm'),mx=fm.getContext('2d'),fxc=$('fx'),bx=bg.getContext('2d'),gx=fg.getContext('2d'),xx=fxc.getContext('2d');
+let img=new Image(),W=0,H=0,dpr=1,L={s:1,ox:0,oy:0},state='menu',timeLeft=0,started=false,cells=[],cleared=0,total=1,path=null,parts=[],ptr=null,last=0,nailState=[],target=[],cur=0;
+
+function setup(){
+ $('shop').textContent=C.shop;$('sTitle').textContent=C.title;$('sText').textContent=C.text;$('hint').textContent=C.hint;
+ $('start').style.backgroundImage=`url(${C.img})`;$('blur').style.backgroundImage=`url(${C.img})`;
+ const m=C.marks,lbl=key==='nails'?['3 ногтя','4 ногтя','все 5']:m.map(x=>x+'%');
+ $('k1').style.left=m[0]+'%';$('k2').style.left=m[1]+'%';
+ $('lab').innerHTML=key==='nails'?`<span id="pct">0</span><span>3 — подарок · 4 — сюрприз · 5 — главный</span>`:`<span id="pct">0%</span><span>${lbl[0]} подарок</span><span>${lbl[1]} сюрприз</span><span>${lbl[2]} главный</span>`;
+ $('tiers').innerHTML=[['всем',0],[lbl[0],1],[lbl[1],2],[lbl[2],3]].map(([t,i])=>`<li><b>${t}</b><span>${C.p[i]}</span></li>`).join('');
+ $('niches').innerHTML=Object.entries(G).map(([k,v])=>`<a href="#${k}" class="${k===key?'cur':''}">${v.label}</a>`).join('');
+ $('palette').innerHTML=COLORS.map((c,i)=>`<button type="button" aria-label="${c[0]}" data-i="${i}" style="background:radial-gradient(circle at 35% 30%,${c[2]},${c[1]} 55%,${c[3]})"></button>`).join('');
+ $('palette').classList.toggle('on',key==='nails');$('sample').classList.toggle('on',key==='nails');
+ $('toast').style.top=key==='nails'?'62%':'';$('tm').textContent=C.time;img=new Image();img.onload=()=>{size();};img.src=C.img;
+}
+addEventListener('hashchange',()=>{const k=location.hash.slice(1);if(G[k]){key=k;C=G[k];state='menu';$('end').classList.remove('on');$('start').classList.add('on');setup();}});
+$('palette').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;cur=+b.dataset.i;paintPal();});
+function paintPal(){[...$('palette').children].forEach((b,i)=>b.classList.toggle('cur',i===cur));}
+
+function size(){W=app.clientWidth;H=app.clientHeight;dpr=Math.min(devicePixelRatio||1,2);
+ for(const c of[bg,fg,fm,fxc]){c.width=W*dpr;c.height=H*dpr;c.getContext('2d').setTransform(dpr,0,0,dpr,0,0);}
+ if(!img.naturalWidth)return;const iw=img.naturalWidth,ih=img.naturalHeight;
+ if(C.fit==='width'){const s=W/iw;L={s,ox:0,oy:Math.min(0,Math.max(H-ih*s,H*.5-C.fy*ih*s))};if(ih*s<H)L.oy=(H-ih*s)*.62;}
+ else{const s=Math.max(W/iw,H/ih)*C.zoom;L={s,ox:Math.min(0,Math.max(W-iw*s,W/2-C.fx*iw*s)),oy:Math.min(0,Math.max(H-ih*s,H*.55-C.fy*ih*s))};}
+ drawBase();}
+const P=(u,v)=>[L.ox+u/100*img.naturalWidth*L.s,L.oy+v/100*img.naturalHeight*L.s];
+function drawPhoto(c){c.drawImage(img,L.ox,L.oy,img.naturalWidth*L.s,img.naturalHeight*L.s);}
+function giftArt(c,x,y,w){// glossy gift card under the beard
+ const g=c.createLinearGradient(x-w/2,y-w/2,x+w/2,y+w/2);g.addColorStop(0,'#ff4a3d');g.addColorStop(.5,'#b3000c');g.addColorStop(1,'#5a0006');
+ c.fillStyle=g;c.beginPath();c.roundRect(x-w/2,y-w/2,w,w,w*.08);c.fill();
+ const gd=c.createLinearGradient(0,y-w/2,0,y+w/2);gd.addColorStop(0,'#fff1b8');gd.addColorStop(.5,'#d9a334');gd.addColorStop(1,'#8a5a08');
+ c.fillStyle=gd;c.fillRect(x-w*.08,y-w/2,w*.16,w);c.fillRect(x-w/2,y-w*.08,w,w*.16);
+ c.beginPath();c.ellipse(x-w*.16,y-w/2-w*.05,w*.17,w*.09,-.5,0,7);c.ellipse(x+w*.16,y-w/2-w*.05,w*.17,w*.09,.5,0,7);c.fill();
+ c.fillStyle='#ffffff55';c.beginPath();c.ellipse(x-w*.25,y-w*.28,w*.18,w*.06,-.6,0,7);c.fill();
+ c.font=`italic 700 ${Math.round(w*.13)}px 'Playfair Display',serif`;c.textAlign='center';c.fillStyle='#fff';c.shadowColor='#000';c.shadowBlur=8;c.fillText('Подарок!',x,y+w*.66);c.shadowBlur=0;}
+function plaque(c){// candy plaque: caramel + pink + sprinkles
+ c.save();c.clip(path);const [x0,y0]=P(41,31.5),[x1,y1]=P(67,37);
+ for(let i=0;i<260;i++){const x=x0+Math.random()*(x1-x0),y=y0+Math.random()*(y1-y0),r=4+Math.random()*12;
+  const col=['#a8641c','#c98a3c','#e8a0b8','#8b4d16','#d6b04a'][i%5];c.fillStyle=col;c.globalAlpha=.55+Math.random()*.4;c.beginPath();c.arc(x,y,r,0,7);c.fill();}
+ c.globalAlpha=1;for(let i=0;i<70;i++){c.fillStyle=['#ff3b6b','#3bd1ff','#ffe14a','#7dff6b'][i%4];c.save();c.translate(x0+Math.random()*(x1-x0),y0+Math.random()*(y1-y0));c.rotate(Math.random()*3);c.fillRect(-4,-1.2,8,2.4);c.restore();}
+ c.restore();}
+function drawBase(){bx.clearRect(0,0,W,H);gx.clearRect(0,0,W,H);bx.fillStyle='#160607';bx.fillRect(0,0,W,H);drawPhoto(bx);
+ if(key==='nails'){initNails();drawNails();return;}
+ if(key==='shave'){mx.clearRect(0,0,W,H);shaveBase();return;}
+ path=new Path2D();C.poly.forEach(([u,v],i)=>{const[x,y]=P(u,v);i?path.lineTo(x,y):path.moveTo(x,y);});path.closePath();
+ if(key==='shave'){bx.save();bx.clip(path);const g=bx.createRadialGradient(...P(50,55),10,...P(50,55),W*.6);g.addColorStop(0,'#7a0d12');g.addColorStop(1,'#2a0306');bx.fillStyle=g;bx.fillRect(0,0,W,H);
+  const[cx,cy]=P(50,52);giftArt(bx,cx,cy,Math.min(W*.42,(P(84,0)[0]-P(16,0)[0])*.6));bx.restore();
+  gx.save();gx.clip(path);drawPhoto(gx);gx.restore();}
+ else plaque(gx);
+ // cells
+ cells=[];const step=key==='shave'?12:6,b=boundsOf();for(let y=b.y0;y<b.y1;y+=step)for(let x=b.x0;x<b.x1;x+=step)if(bx.isPointInPath(path,x*dpr,y*dpr))cells.push({x,y,h:0});
+ total=cells.length||1;cleared=0;ui();}
+function isIn(x,y){bx.save();bx.setTransform(1,0,0,1,0,0);const r=bx.isPointInPath(path,x*dpr,y*dpr);bx.restore();return r;}
+function boundsOf(){const pts=C.poly.map(([u,v])=>P(u,v));return{x0:Math.min(...pts.map(p=>p[0])),x1:Math.max(...pts.map(p=>p[0])),y0:Math.min(...pts.map(p=>p[1])),y1:Math.max(...pts.map(p=>p[1]))};}
+
+// nails
+function initNails(){if(state!=='play'||!nailState.length)nailState=C.nails.map(()=>({c:-1,cov:0}));}
+function nailPath(n){const[u,v,w,h,rot]=n,[x,y]=P(u,v),rx=w/200*img.naturalWidth*L.s,ry=h/100*img.naturalHeight*L.s/2*1.05;return{x,y,rx:rx*.86,ry:ry*.9,rot:rot*Math.PI/180};}
+function drawNails(){gx.clearRect(0,0,W,H);C.nails.forEach((n,i)=>{const s=nailState[i];if(target.length&&state==='play'){const{x,y,ry,rot}=nailPath(n),t=COLORS[target[i]],ok=s&&s.cov>=1&&s.c===target[i];gx.save();gx.translate(x,y);gx.rotate(rot);gx.translate(0,-ry-15);gx.beginPath();gx.arc(0,0,9,0,7);const gg=gx.createRadialGradient(-3,-3,1,0,0,9);gg.addColorStop(0,t[2]);gg.addColorStop(1,t[3]);gx.fillStyle=gg;gx.fill();gx.lineWidth=2;gx.strokeStyle=ok?'#36d66f':'#fff';gx.stroke();if(ok){gx.rotate(-rot);gx.fillStyle='#fff';gx.font='800 11px Manrope';gx.textAlign='center';gx.textBaseline='middle';gx.fillText('✓',0,0);}gx.restore();}if(!s||s.c<0)return;const{x,y,rx,ry,rot}=nailPath(n),col=COLORS[s.c];
+ gx.save();gx.translate(x,y);gx.rotate(rot);gx.globalAlpha=Math.min(1,.25+s.cov*.75);
+ const g=gx.createLinearGradient(-rx,0,rx,0);g.addColorStop(0,col[3]);g.addColorStop(.35,col[1]);g.addColorStop(.55,col[2]);g.addColorStop(.75,col[1]);g.addColorStop(1,col[3]);
+ gx.fillStyle=g;gx.beginPath();gx.ellipse(0,0,rx,ry,0,0,7);gx.fill();
+ gx.fillStyle='#ffffffaa';gx.beginPath();gx.ellipse(-rx*.35,-ry*.15,rx*.14,ry*.55,0,0,7);gx.fill();
+ if(s.cov>=1&&s.c===1){gx.fillStyle='#fff';for(let k=0;k<6;k++){gx.globalAlpha=.8;gx.fillRect((Math.random()-.5)*rx*1.4,(Math.random()-.5)*ry*1.4,1.6,1.6);}}
+ gx.restore();});}
+
+function ui(){let p,shown;
+ if(key==='nails'){p=nailScore();$('pct').textContent=`Совпало ${p} из 5`;$('fill').style.width=p*20+'%';return;}
+ p=Math.round(cleared/total*100);if(key==='shave'){$('pct').textContent=stage===1?`Пена ${Math.round(foamed/total*100)}%`:`${p}% · порезы ${nicks}/3`;$('fill').style.width=p+'%';return;}$('pct').textContent=p+'%';$('fill').style.width=p+'%';}
+function nailScore(){return nailState.reduce((a,s,i)=>a+(s.cov>=1&&s.c===target[i]?1:0),0);}
+function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),1300);}
+
+let passed=[0,0];
+let stage=1,nicks=0,foamed=0,beardP=null,cutP=null,curveP=null,lastWarn=0;
+const CURVE=[[17,27.5],[23,28],[26,36],[30,44],[36,50.5],[43,54.5],[50,56],[57,54.5],[64,50.5],[70,44],[74,36],[77,28],[83,27.5]];
+function shaveBase(){beardP=new Path2D();C.poly.forEach(([u,v],i)=>{const[x,y]=P(u,v);i?beardP.lineTo(x,y):beardP.moveTo(x,y);});beardP.closePath();
+ cutP=new Path2D();cutP.moveTo(...P(0,27.5));CURVE.forEach(p=>cutP.lineTo(...P(...p)));cutP.lineTo(...P(100,27.5));cutP.lineTo(...P(100,100));cutP.lineTo(...P(0,100));cutP.closePath();
+ curveP=new Path2D();CURVE.slice(1,-1).forEach((p,i)=>i?curveP.lineTo(...P(...p)):curveP.moveTo(...P(...p)));
+ mx.clearRect(0,0,W,H);
+ // coat under the beard
+ bx.save();bx.clip(beardP);bx.clip(cutP);
+ {const iw=img.naturalWidth,ih=img.naturalHeight,sx=.845*iw,sy=.40*ih,sw=.15*iw,sh=.32*ih,tw=sw*L.s,th=sh*L.s,[x0,y0]=P(14,26);let col=0;
+  for(let x=x0;x<P(86,0)[0];x+=tw,col++)for(let y=y0,row=0;y<P(0,100)[1];y+=th,row++){bx.save();bx.translate(x+(col%2?tw:0),y+(row%2?th:0));bx.scale(col%2?-1:1,row%2?-1:1);bx.drawImage(img,sx,sy,sw,sh,0,0,tw,th);bx.restore();}
+  const[cx,cy]=P(50,62),g=bx.createRadialGradient(cx,cy,10,cx,cy,W*.6);g.addColorStop(0,'#00000000');g.addColorStop(1,'#00000088');bx.fillStyle=g;bx.fillRect(0,0,W,H);
+  const[fx0]=P(46,0),[fx1]=P(54,0),fg2=bx.createLinearGradient(fx0,0,fx1,0);fg2.addColorStop(0,'#d8d0c400');fg2.addColorStop(.25,'#f1ebe2');fg2.addColorStop(.75,'#e9e2d6');fg2.addColorStop(1,'#d8d0c400');bx.fillStyle=fg2;bx.fillRect(fx0,P(0,50)[1],fx1-fx0,H);
+  bx.strokeStyle='#ffffff55';bx.lineWidth=1;for(let k=0;k<160;k++){const x=fx0+Math.random()*(fx1-fx0),y=P(0,50)[1]+Math.random()*H;bx.beginPath();bx.moveTo(x,y);bx.lineTo(x+(Math.random()-.5)*6,y+6);bx.stroke();}}
+ bx.shadowColor='#000c';bx.shadowBlur=18;bx.shadowOffsetY=10;bx.strokeStyle='#f5efe6';bx.lineWidth=10;bx.stroke(curveP);bx.restore();
+ gx.save();gx.clip(beardP);gx.clip(cutP);drawPhoto(gx);gx.restore();
+ cells=[];const b=boundsOf();for(let y=b.y0;y<b.y1;y+=11)for(let x=b.x0;x<b.x1;x+=11)if(inCut(x,y))cells.push({x,y,f:0,h:0});
+ total=cells.length||1;cleared=0;foamed=0;ui();}
+function hit(p,x,y){return bx.isPointInPath(p,x*dpr,y*dpr);}
+function inCut(x,y){return hit(beardP,x,y)&&hit(cutP,x,y);}
+function shaveWork(x,y,dx,dy,d){const now=performance.now();
+ if(stage===1){const r=Math.max(16,W*.06);mx.save();mx.clip(beardP);mx.clip(cutP);
+   for(let k=0;k<5;k++){const px=x+(Math.random()-.5)*r*1.6,py=y+(Math.random()-.5)*r*1.6,rr=5+Math.random()*11,g=mx.createRadialGradient(px-rr*.3,py-rr*.3,1,px,py,rr);g.addColorStop(0,'#ffffff');g.addColorStop(.7,'#f4f6fb');g.addColorStop(1,'#c9d3e4');mx.fillStyle=g;mx.beginPath();mx.arc(px,py,rr,0,7);mx.fill();}
+   mx.restore();for(const c of cells)if(!c.f&&(c.x-x)**2+(c.y-y)**2<(r*1.5)**2){c.f=1;foamed++;}
+   if(Math.random()<.5)parts.push({x,y,vx:(Math.random()-.5)*50,vy:-30,t:0,life:.8,k:'foam',r:3+Math.random()*5});
+   ui();if(foamed/total>=.8){stage=2;$('hint').textContent='Шаг 2: брейте сверху вниз, не заходя за золотой контур';$('hint').classList.remove('off');setTimeout(()=>$('hint').classList.add('off'),2600);toast('Пена готова! Берите бритву');}
+   return;}
+ const inBeard=hit(beardP,x,y),[,topY]=P(50,23);
+ if((inBeard&&!hit(cutP,x,y))||(y<topY&&y>P(50,16)[1]&&x>P(30,0)[0]&&x<P(70,0)[0])){if(now-lastWarn>700){lastWarn=now;nicks++;ui();toast(nicks>=3?'Ай! Дед Мороз обиделся':'Ой, порез! Осторожнее с контуром');
+   for(let k=0;k<10;k++)parts.push({x,y,vx:(Math.random()-.5)*160,vy:(Math.random()-.5)*160,t:0,life:.5,k:'spark',c:'#ff2b2b'});app.animate([{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'none'}],{duration:220});
+   if(nicks>=3)finish();}return;}
+ if(dy<-1.5){if(now-lastWarn>900){lastWarn=now;toast('Брейте сверху вниз, по росту бороды!');}return;}
+ if(!inCut(x,y))return;
+ const r=Math.max(12,W*.042);
+ for(const c2 of[gx,mx]){c2.save();c2.clip(beardP);c2.clip(cutP);c2.globalCompositeOperation='destination-out';c2.lineCap='round';c2.lineWidth=r*2;c2.beginPath();c2.moveTo(x-dx,y-dy);c2.lineTo(x,y);c2.stroke();c2.restore();}
+ for(const c of cells){if(c.h)continue;const t=Math.max(0,Math.min(1,((c.x-(x-dx))*dx+(c.y-(y-dy))*dy)/(d*d))),px=x-dx+dx*t-c.x,py=y-dy+dy*t-c.y;if(px*px+py*py<r*r){c.h=1;cleared++;}}
+ for(let k=0;k<3;k++)parts.push({x:x+(Math.random()-.5)*r,y,vx:(Math.random()-.5)*80,vy:Math.random()*40,t:0,life:1.2,k:'hair',a:Math.random()*6});
+ if(Math.random()<.6)parts.push({x,y,vx:(Math.random()-.5)*40,vy:20,t:0,life:.8,k:'foam',r:3+Math.random()*6});
+ const p=cleared/total*100;ui();for(let i=0;i<2;i++)if(p>=C.marks[i]&&!passed[i]){passed[i]=1;toast(i?'Сюрприз открыт!':'Подарок открыт!');}
+ if(p>=C.marks[2])finish();}
+function work(x,y,dx,dy){const d=Math.hypot(dx,dy);if(!d)return;if(key==='shave'){shaveWork(x,y,dx,dy,d);return;}
+ if(key==='nails'){C.nails.forEach((n,i)=>{const{x:nx,y:ny,rx,ry,rot}=nailPath(n);const cx=x-nx,cy=y-ny,c=Math.cos(-rot),s=Math.sin(-rot),lx=cx*c-cy*s,ly=cx*s+cy*c;
+   if((lx*lx)/(Math.max(rx+12,22)**2)+(ly*ly)/(Math.max(ry+12,26)**2)<=1){const st=nailState[i];if(st.c!==cur){st.c=cur;st.cov=0;}const was=st.cov;st.cov=Math.min(1,st.cov+Math.max(d,4)/(Math.max(ry,14)*2.2));
+    if(Math.random()<.4)parts.push({x,y,vx:(Math.random()-.5)*60,vy:-Math.random()*60,t:0,life:.6,k:'spark',c:COLORS[cur][2]});
+    if(was<1&&st.cov>=1){for(let k=0;k<14;k++)parts.push({x:nx,y:ny,vx:(Math.random()-.5)*220,vy:(Math.random()-.5)*220,t:0,life:.7,k:'spark',c:k%2?'#f6c453':COLORS[cur][2]});
+     if(st.c===target[i])toast('Как в образце!');}}});
+  drawNails();ui();const sc=nailScore();if(sc>=5)finish();return;}
+ const r=Math.max(10,C.brush*Math.min(W,H)*(key==='smile'?C.zoom:1));
+ gx.save();gx.clip(path);gx.globalCompositeOperation='destination-out';gx.globalAlpha=key==='smile'?.35:1;gx.lineCap='round';gx.lineWidth=r*2;
+ gx.beginPath();gx.moveTo(x-dx,y-dy);gx.lineTo(x,y);gx.stroke();gx.restore();
+ for(const c of cells){if(c.h>=C.need)continue;const t=Math.max(0,Math.min(1,((c.x-(x-dx))*dx+(c.y-(y-dy))*dy)/(d*d))),px=x-dx+dx*t-c.x,py=y-dy+dy*t-c.y;
+  if(px*px+py*py<r*r){c.h+=key==='smile'?Math.min(1,d/25):1;if(c.h>=C.need)cleared++;}}
+ if(key==='shave'){for(let k=0;k<2;k++)parts.push({x:x+(Math.random()-.5)*r,y,vx:(Math.random()-.5)*80,vy:Math.random()*40,t:0,life:1.2,k:'hair',a:Math.random()*6});if(Math.random()<.5)parts.push({x,y,vx:(Math.random()-.5)*40,vy:-20,t:0,life:.8,k:'foam',r:4+Math.random()*7});}
+ else{if(Math.random()<.6)parts.push({x:x+(Math.random()-.5)*r*2,y:y+(Math.random()-.5)*r,vx:(Math.random()-.5)*30,vy:-30-Math.random()*40,t:0,life:1,k:'bubble',r:3+Math.random()*6});}
+ const p=cleared/total*100;ui();
+ for(let i=0;i<2;i++)if(p>=C.marks[i]&&!passed[i]){passed[i]=1;toast(i?'Сюрприз открыт!':'Подарок открыт!');}
+ if(p>=C.marks[2])finish();}
+
+function tool(x,y){xx.save();xx.translate(x,y);
+ if(key==='shave'&&stage===1){xx.rotate(-.3);xx.fillStyle='#7a4a22';xx.beginPath();xx.roundRect(-9,14,18,46,8);xx.fill();const gg=xx.createLinearGradient(-9,0,9,0);gg.addColorStop(0,'#8a5a08');gg.addColorStop(.5,'#fff0b0');gg.addColorStop(1,'#b37a14');xx.fillStyle=gg;xx.fillRect(-10,8,20,8);xx.fillStyle='#f4f0e8';xx.beginPath();xx.ellipse(0,-6,12,16,0,0,7);xx.fill();xx.fillStyle='#fff';xx.beginPath();xx.arc(-4,-16,7,0,7);xx.arc(5,-14,6,0,7);xx.fill();}
+ else if(key==='shave'){xx.rotate(-.5);const g=xx.createLinearGradient(-6,0,6,0);g.addColorStop(0,'#8a5a08');g.addColorStop(.5,'#fff0b0');g.addColorStop(1,'#b37a14');
+  xx.fillStyle=g;xx.beginPath();xx.roundRect(-7,8,14,70,6);xx.fill();const s=xx.createLinearGradient(0,-14,0,8);s.addColorStop(0,'#fff');s.addColorStop(1,'#9aa3b5');xx.fillStyle=s;xx.beginPath();xx.roundRect(-26,-14,52,22,4);xx.fill();xx.fillStyle='#ffffffcc';xx.fillRect(-24,-12,48,3);}
+ else if(key==='smile'){xx.rotate(-.7);const g=xx.createLinearGradient(-5,0,5,0);g.addColorStop(0,'#8a5a08');g.addColorStop(.5,'#fff0b0');g.addColorStop(1,'#b37a14');xx.fillStyle=g;xx.beginPath();xx.roundRect(-5,10,10,80,5);xx.fill();
+  xx.fillStyle='#e3262f';xx.beginPath();xx.roundRect(-8,-12,16,24,5);xx.fill();xx.fillStyle='#fff';for(let i=0;i<4;i++)xx.fillRect(-7+i*4,-24,3,14);xx.fillStyle='#bfe9ff';for(let i=0;i<4;i++)xx.fillRect(-7+i*4,-24,3,4);}
+ else{xx.rotate(-.6);const g=xx.createLinearGradient(-5,0,5,0);g.addColorStop(0,'#8a5a08');g.addColorStop(.5,'#fff0b0');g.addColorStop(1,'#b37a14');xx.fillStyle=g;xx.beginPath();xx.roundRect(-5,10,10,70,5);xx.fill();
+  xx.fillStyle=COLORS[cur][1];xx.beginPath();xx.moveTo(-5,10);xx.quadraticCurveTo(0,-14,5,10);xx.fill();}
+ xx.restore();}
+function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;xx.clearRect(0,0,W,H);
+ if(state==='play'&&started){timeLeft-=dt;$('tm').textContent=Math.max(0,Math.ceil(timeLeft));if(timeLeft<=0)finish();}
+ for(let i=parts.length-1;i>=0;i--){const p=parts[i];p.t+=dt;if(p.t>p.life){parts.splice(i,1);continue;}const k=1-p.t/p.life;
+  if(p.k==='hair'){p.vy+=300*dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.a+=dt*5;xx.strokeStyle=`rgba(255,250,240,${k})`;xx.lineWidth=1.4;xx.beginPath();xx.moveTo(p.x,p.y);xx.quadraticCurveTo(p.x+6*Math.cos(p.a),p.y+6,p.x+10*Math.sin(p.a),p.y+12);xx.stroke();}
+  else if(p.k==='foam'||p.k==='bubble'){p.x+=p.vx*dt;p.y+=p.vy*dt;xx.globalAlpha=k*.9;const g=xx.createRadialGradient(p.x-p.r*.3,p.y-p.r*.3,1,p.x,p.y,p.r);g.addColorStop(0,'#fff');g.addColorStop(1,p.k==='bubble'?'#9fd8ff55':'#ffffffaa');xx.fillStyle=g;xx.beginPath();xx.arc(p.x,p.y,p.r,0,7);xx.fill();xx.globalAlpha=1;}
+  else{p.vy+=200*dt;p.x+=p.vx*dt;p.y+=p.vy*dt;xx.globalAlpha=k;xx.fillStyle=p.c;xx.save();xx.translate(p.x,p.y);xx.rotate(p.t*8);xx.fillRect(-3,-3,6,6);xx.restore();xx.globalAlpha=1;}}
+ if(key==='shave'&&curveP&&state==='play'){xx.save();xx.setLineDash([7,7]);xx.lineDashOffset=-now/40;xx.strokeStyle=stage===2?'#f6c453':'#f6c45366';xx.lineWidth=3;xx.shadowColor='#f6c453';xx.shadowBlur=stage===2?10:0;xx.stroke(curveP);xx.restore();}
+ if(ptr&&state==='play')tool(ptr.x,ptr.y);
+ requestAnimationFrame(frame);}
+function pt(e){const rc=fxc.getBoundingClientRect();return{x:e.clientX-rc.left,y:e.clientY-rc.top};}
+let isDown=false;
+fxc.addEventListener('pointerdown',e=>{if(state!=='play')return;isDown=true;ptr=pt(e);if(!started){started=true;$('hint').classList.add('off');}});
+fxc.addEventListener('pointermove',e=>{const p=pt(e);if(isDown&&ptr&&state==='play')work(p.x,p.y,p.x-ptr.x,p.y-ptr.y);ptr=p;});
+addEventListener('pointerup',()=>{isDown=false;});
+
+function newGame(){state='play';stage=1;nicks=0;if(key==='shave')$('hint').textContent=C.hint;started=false;timeLeft=C.time;passed=[0,0];parts=[];$('hint').classList.remove('off');$('tm').textContent=C.time;
+ if(key==='nails'){nailState=C.nails.map(()=>({c:-1,cov:0}));target=C.nails.map(()=>Math.floor(Math.random()*4));if(new Set(target).size<2)target[0]=(target[0]+1)%4;
+  $('chips').innerHTML=target.map(t=>`<i style="background:linear-gradient(90deg,${COLORS[t][3]},${COLORS[t][1]} 40%,${COLORS[t][2]} 55%,${COLORS[t][1]} 70%,${COLORS[t][3]})" title="${COLORS[t][0]}"></i>`).join('');cur=target[0];paintPal();}
+ drawBase();if(key==='nails')drawNails();ui();}
+function finish(){if(state!=='play')return;state='end';
+ let tier;if(key==='nails'){const s=nailScore();tier=s>=5?3:s>=4?2:s>=3?1:0;$('eTitle').textContent=s>=5?'Идеальный маникюр! Главный приз ваш':`Совпало ${s} из 5!`;}
+ else{const p0=Math.round(cleared/total*100),p=key==='shave'?Math.max(0,p0-nicks*10):p0;tier=p>=C.marks[2]?3:p>=C.marks[1]?2:p>=C.marks[0]?1:0;$('eTitle').textContent=tier===3?(key==='shave'?'Борода как с обложки! Главный приз ваш':'Зубы сияют! Главный приз ваш'):(key==='shave'&&nicks>=3?'Три пореза — Дед Мороз ушёл, но подарок оставил':`Готово на ${p}%!`);}
+ const prize=C.p[tier],code='NY27-'+Math.floor(1000+Math.random()*9000);$('ePrize').textContent=prize;$('eCode').textContent=code;
+ $('wa').href='https://wa.me/'+WA+'?text='+encodeURIComponent(`Здравствуйте! Я сыграл(а) в «${C.name}» и выиграл(а): ${prize}. Код ${code}. Хочу забрать подарок!`);
+ $('again').style.display=tier===3?'none':'';setTimeout(()=>$('end').classList.add('on'),700);}
+new ResizeObserver(size).observe(app);setup();requestAnimationFrame(frame);
+$('play').onclick=()=>{$('start').classList.remove('on');newGame();};
+$('again').onclick=()=>{$('end').classList.remove('on');newGame();};
+}
+</script>
+</body>
+</html>

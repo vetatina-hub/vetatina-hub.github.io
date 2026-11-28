@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Разбей лёд</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: праздничная аркада, азарт «ещё чуть-чуть до главного приза»
+   IDEA: Красная Огненная Коза спрятала подарок подо льдом; живое фото подо льдом
+   PICTURE: настоящий 3D-лёд с бликами, золотой снежок, красные коробки с лентой
+   COLOUR and TYPE: ночь #160607, огненный #e3262f, золото #f6c453; Playfair italic + Manrope
+   LAYOUT: один экран телефона, HUD сверху, поле во весь экран, планка под пальцем */
+:root{color-scheme:dark;--bg:#160607;--ink:#fff7ec;--muted:#e8cdb8;--fire:#e3262f;--gold:#f6c453;--acc:#e3262f}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:16px/1.5 Manrope,system-ui,sans-serif;overflow:hidden}
+.blur{position:fixed;inset:-40px;background:center/cover;filter:blur(30px) brightness(.45);z-index:0}
+.app{position:relative;z-index:1;height:100dvh;max-width:520px;margin:0 auto;overflow:hidden;background:#000;box-shadow:0 0 60px #0009}
+.photo{position:absolute;inset:0;background:center/cover}
+#cv{position:absolute;inset:0;width:100%;height:100%;touch-action:none;display:block}
+.hud{position:absolute;left:0;right:0;top:0;padding:12px 14px 16px;background:linear-gradient(#0d0304e6,#0d030400);z-index:3;pointer-events:none}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:800}
+.balls{display:flex;gap:5px}
+.balls i{width:15px;height:15px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0 18%,#ffe39a 30%,#c9861b 75%,#7a4a08);box-shadow:0 0 8px #f6c45399}
+.balls i.off{opacity:.2;filter:grayscale(1)}
+.bar{position:relative;height:12px;border-radius:8px;background:#ffffff26;margin:9px 0 4px;overflow:hidden}
+.fill{height:100%;width:0;background:linear-gradient(90deg,#ff7a3c,var(--gold));border-radius:8px;transition:width .3s;box-shadow:0 0 12px #f6c453}
+.tick{position:absolute;top:-1px;width:2px;height:14px;background:#fff8}
+.lab{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+.toast{position:absolute;left:50%;top:24%;transform:translate(-50%,0) scale(.8);opacity:0;z-index:4;background:linear-gradient(#ff4a3d,#b3121c);border:1px solid #ffd27a;padding:10px 18px;border-radius:16px;font-weight:800;white-space:nowrap;transition:.3s;pointer-events:none;box-shadow:0 8px 30px #e3262f88}
+.toast.on{opacity:1;transform:translate(-50%,0) scale(1)}
+.hint{position:absolute;left:0;right:0;bottom:25%;text-align:center;font-weight:700;z-index:3;pointer-events:none;text-shadow:0 2px 8px #000;opacity:0;transition:.3s}
+.hint.on{opacity:1}
+.layer{position:absolute;inset:0;z-index:5;display:none;flex-direction:column;justify-content:flex-end;padding:18px 18px 22px;background:center/cover;overflow-y:auto}
+.layer.on{display:flex;animation:in .45s ease}
+.layer::before{content:"";position:absolute;inset:0;background:linear-gradient(#16060700 15%,#160607d9 55%,#160607 78%);z-index:-1}
+.layer>*{position:relative}
+@keyframes in{from{opacity:0;transform:scale(1.03)}to{opacity:1;transform:none}}
+h1{font:italic 700 clamp(27px,7.4vw,36px)/1.08 'Playfair Display',serif;margin:0 0 10px;text-wrap:balance;text-shadow:0 2px 14px #000}
+.layer p{margin:0 0 12px;color:var(--muted)}
+.tiers{list-style:none;margin:0 0 14px;padding:0;display:grid;gap:5px}
+.tiers li{display:flex;gap:10px;align-items:center;background:#ffffff12;border:1px solid #ffffff1f;border-radius:12px;padding:7px 12px;font-size:14px}
+.tiers b{min-width:44px;color:var(--gold)}
+.btn{display:block;width:100%;min-height:54px;border:0;border-radius:16px;font:800 18px Manrope,sans-serif;color:#fff;cursor:pointer;text-align:center;text-decoration:none;line-height:54px;background:linear-gradient(#ff5145,#c3151f);box-shadow:0 8px 24px #e3262f66,inset 0 1px 0 #ffffff66}
+.btn.wa{background:linear-gradient(#36d66f,#16a34a);box-shadow:0 8px 24px #16a34a55,inset 0 1px 0 #ffffff66}
+.btn:focus-visible,.link:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.link{background:none;border:0;color:var(--gold);font:700 15px Manrope;text-decoration:underline;min-height:44px;cursor:pointer;width:100%}
+.prize{padding:16px;border-radius:20px;border:2px solid var(--gold);background:linear-gradient(#3a0d0fcc,#1e0708cc);margin-bottom:12px;box-shadow:0 0 30px #f6c45333}
+.prize small{color:var(--muted);font-size:13px;display:block}
+.prize strong{display:block;font-size:24px;line-height:1.2;margin:4px 0;color:#fff}
+.prize code{font:800 17px Manrope;color:var(--gold);letter-spacing:1px}
+.demo{font-size:13px;color:var(--muted);text-align:center;margin:10px 0 0}
+.demo a{color:var(--gold)}
+.niches{display:flex;gap:8px;justify-content:center;margin-top:10px;flex-wrap:wrap}
+.niches a{font-size:13px;color:var(--ink);padding:7px 13px;border-radius:20px;background:#ffffff1a;text-decoration:none;min-height:32px}
+.niches a.cur{background:var(--gold);color:#2a0708;font-weight:800}
+.load{position:absolute;inset:0;z-index:9;display:grid;place-items:center;background:var(--bg);font-weight:700;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){.layer.on{animation:none}}
+</style>
+</head>
+<body>
+<div class="blur" id="blur"></div>
+<div class="app" id="app">
+  <div class="photo" id="photo"></div>
+  <canvas id="cv"></canvas>
+  <div class="hud">
+    <div class="top"><span id="shop">Ваша кофейня</span><span class="balls" id="balls" aria-label="Снежки"></span></div>
+    <div class="bar" aria-label="Сколько льда разбито"><div class="fill" id="fill"></div><div class="tick" style="left:30%"></div><div class="tick" style="left:65%"></div></div>
+    <div class="lab"><span id="pct">0% льда</span><span>30% подарок</span><span>65% сюрприз</span><span>100% главный</span></div>
+  </div>
+  <div class="toast" id="toast"></div>
+  <div class="hint" id="hint">Коснитесь экрана — бросить снежок</div>
+
+  <div class="layer on" id="start">
+    <h1 id="sTitle">Огненная Коза спрятала подарок подо льдом</h1>
+    <p id="sText">Ведите пальцем золотую планку и отбивайте снежок. Чем больше льда разобьёте, тем круче подарок.</p>
+    <ul class="tiers" id="tiers"></ul>
+    <button class="btn" id="play" type="button">Играть</button>
+    <div class="niches" id="niches"></div>
+  </div>
+
+  <div class="layer" id="end">
+    <h1 id="eTitle">Лёд разбит!</h1>
+    <div class="prize"><small>Коза дарит вам</small><strong id="ePrize">—</strong><code id="eCode">NY27-0000</code><small>Покажите этот экран администратору или напишите в WhatsApp. Действует до 10 января.</small></div>
+    <a class="btn wa" id="wa" href="#" target="_blank" rel="noopener">Забрать подарок в WhatsApp</a>
+    <button class="link" id="again" type="button">Сыграть ещё раз и добить до главного приза</button>
+    <p class="demo">Демо для бизнеса: такая игра с вашими фото, логотипом и подарками за 24 часа. Сотрудникам ничего делать не нужно. WhatsApp <a href="https://wa.me/77781436982" target="_blank" rel="noopener">+7 778 143 69 82</a></p>
+  </div>
+  <div class="load" id="load">Готовим лёд…</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+{
+const WA='77781436982';
+const N={
+ coffee:{label:'Кофейня',shop:'Ваша кофейня',img:'coffee.jpg',title:'Огненная Коза спрятала праздничный кофе подо льдом',p:['Сироп в подарок','Второй напиток −50%','Десерт к кофе бесплатно','Напиток + десерт бесплатно']},
+ salon:{label:'Салон',shop:'Ваш салон',img:'nails.jpg',title:'Огненная Коза спрятала новогодний маникюр подо льдом',p:['−10% на любую услугу','Дизайн на 2 ногтя в подарок','−25% на новогодний маникюр','Маникюр с покрытием бесплатно']},
+ barber:{label:'Барбершоп',shop:'Ваш барбершоп',img:'barber.jpg',title:'Огненная Коза спрятала новогоднюю стрижку подо льдом',p:['Укладка в подарок','Камуфляж бороды −50%','−25% на стрижку','Стрижка бесплатно']},
+ kids:{label:'Детский центр',shop:'Ваш детский центр',img:'dino.jpg',title:'Динозаврик и Коза спрятали подарок подо льдом',p:['Сладкий подарок','Пробное занятие бесплатно','−25% на абонемент','Месяц занятий −50%']}};
+const $=id=>document.getElementById(id);
+let key=(location.hash||'#coffee').slice(1);if(!N[key])key='coffee';let C=N[key];
+
+function applyNiche(){
+ $('shop').textContent=C.shop;$('sTitle').textContent=C.title;
+ $('photo').style.backgroundImage=`url(${C.img})`;$('blur').style.backgroundImage=`url(${C.img})`;
+ $('start').style.backgroundImage='url(goat.jpg)';$('end').style.backgroundImage='url(goatgift.jpg)';
+ $('tiers').innerHTML=[['всем',0],['30%',1],['65%',2],['100%',3]].map(([t,i])=>`<li><b>${t}</b><span>${C.p[i]}</span></li>`).join('');
+ $('niches').innerHTML=Object.entries(N).map(([k,v])=>`<a href="#${k}" class="${k===key?'cur':''}">${v.label}</a>`).join('');
+}
+applyNiche();
+addEventListener('hashchange',()=>{const k=location.hash.slice(1);if(N[k]){key=k;C=N[k];applyNiche();loadEnv();}});
+
+if(!window.THREE){$('load').textContent='Не удалось загрузить игру. Обновите страницу.';}
+else{
+const T=THREE,cv=$('cv'),app=$('app');
+const R=new T.WebGLRenderer({canvas:cv,antialias:true,alpha:true});
+R.setPixelRatio(Math.min(devicePixelRatio||1,2));R.outputEncoding=T.sRGBEncoding;R.toneMapping=T.ACESFilmicToneMapping;R.toneMappingExposure=1.15;
+const S=new T.Scene(),cam=new T.PerspectiveCamera(32,1,1,100);cam.position.set(0,0,22);
+const pm=new T.PMREMGenerator(R);
+S.add(new T.HemisphereLight(0xfff1dc,0x3a0b0b,0.55));
+const sun=new T.DirectionalLight(0xffe2b0,1.1);sun.position.set(-6,10,12);S.add(sun);const rim=new T.DirectionalLight(0x9fd8ff,.9);rim.position.set(8,-4,6);S.add(rim);
+const ballLight=new T.PointLight(0xffb347,1.6,9);S.add(ballLight);
+
+const M={
+ ice:new T.MeshPhysicalMaterial({color:0xa9dcff,emissive:0x0b2a44,emissiveIntensity:.35,metalness:.1,roughness:.03,clearcoat:1,clearcoatRoughness:.02,transparent:true,opacity:.66,envMapIntensity:2.6,reflectivity:1}),
+ gift:new T.MeshPhysicalMaterial({color:0xa8000c,metalness:.45,roughness:.18,clearcoat:1,clearcoatRoughness:.05,envMapIntensity:2}),
+ gold:new T.MeshPhysicalMaterial({color:0xffcf6a,emissive:0x3a2200,metalness:1,roughness:.12,clearcoat:.8,envMapIntensity:2.6}),
+ snow:new T.MeshPhysicalMaterial({color:0xffe9b8,emissive:0x442a00,metalness:.85,roughness:.1,clearcoat:1,envMapIntensity:2.8})};
+function loadEnv(){new T.TextureLoader().load(C.img,t=>{t.mapping=T.EquirectangularReflectionMapping;t.encoding=T.sRGBEncoding;const e=pm.fromEquirectangular(t).texture;S.environment=e;for(const m of Object.values(M))m.envMap=e,m.needsUpdate=true;t.dispose();$('load').style.display='none';},undefined,()=>{$('load').style.display='none'});}
+loadEnv();
+
+// rounded glossy brick (unit size, scaled per brick)
+const sh=new T.Shape(),r=.16,w=1,h=1;
+sh.moveTo(-w/2+r,-h/2);sh.lineTo(w/2-r,-h/2);sh.quadraticCurveTo(w/2,-h/2,w/2,-h/2+r);sh.lineTo(w/2,h/2-r);sh.quadraticCurveTo(w/2,h/2,w/2-r,h/2);sh.lineTo(-w/2+r,h/2);sh.quadraticCurveTo(-w/2,h/2,-w/2,h/2-r);sh.lineTo(-w/2,-h/2+r);sh.quadraticCurveTo(-w/2,-h/2,-w/2+r,-h/2);
+const BG=new T.ExtrudeGeometry(sh,{depth:.5,bevelEnabled:true,bevelThickness:.12,bevelSize:.08,bevelSegments:4,curveSegments:6});BG.center();
+const ribbonV=new T.BoxGeometry(.16,1.06,.78),ribbonH=new T.BoxGeometry(1.06,.2,.78);
+const shardG=new T.TetrahedronGeometry(.18,0),sparkG=new T.OctahedronGeometry(.08,0);
+
+const COLS=7,ROWS=9;let W=10,H=16,px=.02,bricks=[],ball,paddle,pw=2.6,ph=.42,br=.3,fx=[],drops=[];
+const group=new T.Group();S.add(group);
+
+ball=new T.Mesh(new T.SphereGeometry(1,40,28),M.snow);S.add(ball);
+paddle=new T.Group();
+const pBody=new T.Mesh(new T.CylinderGeometry(1,1,1,32),M.gold);pBody.rotation.z=Math.PI/2;paddle.add(pBody);
+const capL=new T.Mesh(new T.SphereGeometry(1,24,16),M.gold),capR=capL.clone();paddle.add(capL,capR);
+const pStripe=new T.Mesh(new T.CylinderGeometry(1,1,1,32),M.gift);pStripe.rotation.z=Math.PI/2;paddle.add(pStripe);
+S.add(paddle);
+
+function size(){
+ const cw=app.clientWidth,ch=app.clientHeight;R.setSize(cw,ch,false);cam.aspect=cw/ch;cam.updateProjectionMatrix();
+ H=2*22*Math.tan(T.MathUtils.degToRad(16));W=H*cam.aspect;px=H/ch;
+ pw=Math.max(W*.27,2);ph=Math.max(.36,W*.045);br=Math.max(.26,W*.032);
+ pBody.scale.set(ph/2,pw-ph,ph/2);capL.scale.setScalar(ph/2);capR.scale.setScalar(ph/2);capL.position.x=-(pw-ph)/2;capR.position.x=(pw-ph)/2;
+ pStripe.scale.set(ph/2+.01,pw*.18,ph/2+.01);
+ ball.scale.setScalar(br);paddle.position.y=-H/2+H*.11;
+ layoutBricks();
+}
+function layoutBricks(){
+ const m=W*.04,g=W*.014,top=H/2-110*px,bottom=-H/2+H*.40;
+ const bw=(W-2*m-(COLS-1)*g)/COLS,bh=(top-bottom-(ROWS-1)*g)/ROWS;
+ for(const b of bricks){b.w=bw;b.h=bh;b.x=-W/2+m+bw/2+b.c*(bw+g);b.y=top-bh/2-b.r*(bh+g);b.mesh.position.set(b.x,b.y,0);b.mesh.scale.set(bw,bh,Math.min(bw,bh)*.8);}
+}
+function build(){
+ group.clear();bricks=[];
+ const gifts=new Set();while(gifts.size<6)gifts.add(Math.floor(Math.random()*COLS*ROWS));
+ for(let r2=0;r2<ROWS;r2++)for(let c=0;c<COLS;c++){
+  const i=r2*COLS+c,isG=gifts.has(i),mesh=new T.Mesh(BG,isG?M.gift:M.ice);
+  if(isG){mesh.add(new T.Mesh(ribbonV,M.gold),new T.Mesh(ribbonH,M.gold));}
+  mesh.rotation.set((Math.random()-.5)*.08,(Math.random()-.5)*.1,0);
+  group.add(mesh);bricks.push({r:r2,c,mesh,gift:isG,alive:true,ph:Math.random()*6});
+ }
+ size();
+}
+new ResizeObserver(size).observe(app);
+
+// state
+let state='menu',lives=3,broken=0,vx=0,vy=0,onPad=true,target=0,last=performance.now(),shake=0,hintT=null;
+const total=COLS*ROWS;
+function ballsUI(){$('balls').innerHTML=Array.from({length:Math.max(3,lives)},(_,i)=>`<i class="${i<lives?'':'off'}"></i>`).join('');}
+function progress(){const p=Math.round(broken/total*100);$('fill').style.width=p+'%';$('pct').textContent=p+'% льда';return p;}
+function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),1400);}
+let passed=[false,false];
+function resetBall(){onPad=true;vx=vy=0;$('hint').classList.add('on');clearTimeout(hintT);hintT=setTimeout(launch,2500);}
+function launch(){if(state!=='play'||!onPad)return;onPad=false;$('hint').classList.remove('on');const sp=H*.62,a=(Math.random()*.5-.25);vx=sp*Math.sin(a);vy=sp*Math.cos(a);}
+function newGame(){build();lives=3;broken=0;passed=[false,false];ballsUI();progress();target=0;paddle.position.x=0;state='play';resetBall();}
+
+// input
+function setTarget(e){const rc=cv.getBoundingClientRect();target=((e.clientX-rc.left)/rc.width-.5)*W;}
+cv.addEventListener('pointermove',setTarget);
+cv.addEventListener('pointerdown',e=>{setTarget(e);launch();});
+addEventListener('keydown',e=>{if(state!=='play')return;if(e.key==='ArrowLeft')target=paddle.position.x-W*.12;if(e.key==='ArrowRight')target=paddle.position.x+W*.12;if(e.key===' ')launch();});
+
+function burst(x,y,gift){
+ for(let i=0;i<(gift?14:9);i++){const m=new T.Mesh(i%3===0?sparkG:shardG,gift?(i%2?M.gold:M.gift):(i%3===0?M.gold:M.ice));m.position.set(x,y,.3);S.add(m);
+  fx.push({m,vx:(Math.random()-.5)*7,vy:Math.random()*6+1,vz:Math.random()*6,rx:Math.random()*10,ry:Math.random()*10,t:0,life:.9+Math.random()*.4});}
+ shake=gift?.22:.12;
+}
+function hitBrick(b){
+ b.alive=false;group.remove(b.mesh);broken++;burst(b.x,b.y,b.gift);
+ if(b.gift){const d=new T.Mesh(BG,M.gift);d.add(new T.Mesh(ribbonV,M.gold),new T.Mesh(ribbonH,M.gold));const s=Math.min(b.w,b.h)*.9;d.scale.set(s,s,s*.8);d.position.set(b.x,b.y,.5);S.add(d);drops.push({m:d,s});}
+ const p=progress();
+ if(p>=30&&!passed[0]){passed[0]=true;toast('Подарок открыт! Дальше — сюрприз');}
+ if(p>=65&&!passed[1]){passed[1]=true;toast('Сюрприз открыт! Добейте до главного');}
+ if(broken>=total)setTimeout(()=>finish(),600);
+}
+function finish(){
+ if(state==='end')return;state='end';clearTimeout(hintT);$('hint').classList.remove('on');
+ const p=Math.round(broken/total*100),tier=p>=100?3:p>=65?2:p>=30?1:0,prize=C.p[tier];
+ const code='NY27-'+Math.floor(1000+Math.random()*9000);
+ $('eTitle').textContent=p>=100?'Весь лёд разбит! Главный приз ваш':'Лёд разбит на '+p+'%';
+ $('ePrize').textContent=prize;$('eCode').textContent=code;
+ $('wa').href='https://wa.me/'+WA+'?text='+encodeURIComponent(`Здравствуйте! Я сыграл(а) в «Разбей лёд» с Огненной Козой и выиграл(а): ${prize}. Код ${code}. Хочу забрать подарок!`);
+ $('again').style.display=p>=100?'none':'';
+ setTimeout(()=>$('end').classList.add('on'),500);
+}
+
+function step(dt){
+ // paddle
+ const lim=W/2-pw/2-W*.02;target=Math.max(-lim,Math.min(lim,target));
+ paddle.position.x+= (target-paddle.position.x)*Math.min(1,dt*18);
+ paddle.rotation.z=(target-paddle.position.x)*-.04;
+ const padTop=paddle.position.y+ph/2;
+ if(onPad){ball.position.set(paddle.position.x,padTop+br+.02,.0);return;}
+ const n=Math.ceil(dt/(1/240)),h2=dt/n;
+ for(let k=0;k<n;k++){
+  let x=ball.position.x+vx*h2,y=ball.position.y+vy*h2;
+  if(x<-W/2+br){x=-W/2+br;vx=Math.abs(vx);}if(x>W/2-br){x=W/2-br;vx=-Math.abs(vx);}
+  const ceil=H/2-96*px;if(y>ceil-br){y=ceil-br;vy=-Math.abs(vy);}
+  if(vy<0&&y-br<=padTop&&y>paddle.position.y-ph&&Math.abs(x-paddle.position.x)<=pw/2+br*.6){
+   const off=(x-paddle.position.x)/(pw/2),sp=Math.min(Math.hypot(vx,vy)*1.012,H*.95),a=off*1.05;
+   vx=sp*Math.sin(a);vy=Math.abs(sp*Math.cos(a));y=padTop+br;
+  }
+  for(const b of bricks){if(!b.alive)continue;
+   const dx=x-b.x,dy=y-b.y,ox=b.w/2+br-Math.abs(dx),oy=b.h/2+br-Math.abs(dy);
+   if(ox>0&&oy>0){if(ox<oy){vx=Math.sign(dx)*Math.abs(vx);x+=Math.sign(dx)*ox;}else{vy=Math.sign(dy)*Math.abs(vy);y+=Math.sign(dy)*oy;}hitBrick(b);break;}
+  }
+  ball.position.x=x;ball.position.y=y;
+  if(y<-H/2-br*2){lives--;ballsUI();if(lives<=0){finish();return;}toast('Ещё снежок! Осталось: '+lives);resetBall();return;}
+ }
+ ball.rotation.x-=vy*dt*.8;ball.rotation.y+=vx*dt*.8;
+}
+
+function loop(now){
+ const dt=Math.min(.033,(now-last)/1000);last=now;
+ if(state==='play')step(dt);
+ const t=now/1000;
+ for(const b of bricks)if(b.alive)b.mesh.rotation.y=Math.sin(t*1.1+b.ph)*.2,b.mesh.rotation.x=Math.cos(t*.9+b.ph)*.12;
+ ballLight.position.set(ball.position.x,ball.position.y,2.2);
+ for(let i=fx.length-1;i>=0;i--){const f=fx[i];f.t+=dt;f.vy-=14*dt;f.m.position.x+=f.vx*dt;f.m.position.y+=f.vy*dt;f.m.position.z+=f.vz*dt;f.m.rotation.x+=f.rx*dt;f.m.rotation.y+=f.ry*dt;f.m.scale.setScalar(Math.max(0,1-f.t/f.life));if(f.t>f.life){S.remove(f.m);fx.splice(i,1);}}
+ for(let i=drops.length-1;i>=0;i--){const d=drops[i];d.m.position.y-=H*.28*dt;d.m.rotation.y+=dt*3;d.m.rotation.x=Math.sin(t*4)*.3;
+  const py=paddle.position.y+ph/2;
+  if(state==='play'&&d.m.position.y-d.s/2<=py&&d.m.position.y>paddle.position.y-ph&&Math.abs(d.m.position.x-paddle.position.x)<pw/2+d.s/2){S.remove(d.m);drops.splice(i,1);lives++;ballsUI();toast('Пойман подарок: +1 снежок!');burst(d.m.position.x,py,true);continue;}
+  if(d.m.position.y<-H/2-1){S.remove(d.m);drops.splice(i,1);}}
+ shake*=.9;cam.position.x=(Math.random()-.5)*shake;cam.position.y=(Math.random()-.5)*shake;
+ R.render(S,cam);requestAnimationFrame(loop);
+}
+build();ballsUI();requestAnimationFrame(loop);
+
+$('play').onclick=()=>{$('start').classList.remove('on');newGame();};
+$('again').onclick=()=>{$('end').classList.remove('on');newGame();};
+}
+}
+</script>
+</body>
+</html>

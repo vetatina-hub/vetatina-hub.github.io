@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Собери три</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: праздничная «три в ряд», азарт каскадов и «ещё один ход»
+   IDEA: шкатулка Огненной Козы с ёлочными игрушками — собери три одинаковых
+   PICTURE: настоящие 3D-шары, звёзды, колокольчики и коробки с бликами на тёмном стекле
+   COLOUR and TYPE: ночь #160607, огненный #e3262f, золото #f6c453; Playfair italic + Manrope
+   LAYOUT: экран телефона, HUD сверху, поле 7×8 по центру, ходы и шкала подарков */
+:root{color-scheme:dark;--bg:#160607;--ink:#fff7ec;--muted:#e8cdb8;--fire:#e3262f;--gold:#f6c453}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:16px/1.5 Manrope,system-ui,sans-serif;overflow:hidden}
+.blur{position:fixed;inset:-40px;background:url(goat.jpg) center/cover;filter:blur(30px) brightness(.4);z-index:0}
+.app{position:relative;z-index:1;height:100dvh;max-width:520px;margin:0 auto;overflow:hidden;background:#000;box-shadow:0 0 60px #0009}
+.photo{position:absolute;inset:0;background:url(goat.jpg) center 30%/cover;filter:blur(6px) brightness(.45) saturate(1.2);transform:scale(1.08)}
+#cv{position:absolute;inset:0;width:100%;height:100%;touch-action:none;display:block}
+.hud{position:absolute;left:0;right:0;top:0;padding:12px 14px 10px;z-index:3;pointer-events:none;background:linear-gradient(#0d0304ee,#0d030400)}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:800}
+.moves{display:flex;align-items:baseline;gap:6px;background:linear-gradient(#ff5145,#b3121c);padding:2px 12px;border-radius:12px;border:1px solid #ffd27a}
+.moves b{font-size:20px}.moves small{font-size:12px;color:#ffe3c8}
+.bar{position:relative;height:12px;border-radius:8px;background:#ffffff26;margin:9px 0 4px;overflow:hidden}
+.fill{height:100%;width:0;background:linear-gradient(90deg,#ff7a3c,var(--gold));border-radius:8px;transition:width .35s;box-shadow:0 0 12px #f6c453}
+.tick{position:absolute;top:-1px;width:2px;height:14px;background:#fff8}
+.lab{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+.toast{position:absolute;left:50%;top:17%;transform:translate(-50%,0) scale(.8);opacity:0;z-index:4;background:linear-gradient(#ff4a3d,#b3121c);border:1px solid #ffd27a;padding:10px 18px;border-radius:16px;font-weight:800;white-space:nowrap;transition:.3s;pointer-events:none;box-shadow:0 8px 30px #e3262f88}
+.toast.on{opacity:1;transform:translate(-50%,0) scale(1)}
+.combo{position:absolute;left:0;right:0;bottom:6%;text-align:center;font:italic 700 30px 'Playfair Display',serif;color:var(--gold);text-shadow:0 0 18px #f6c453,0 2px 6px #000;z-index:3;pointer-events:none;opacity:0;transition:.25s}
+.combo.on{opacity:1}
+.layer{position:absolute;inset:0;z-index:5;display:none;flex-direction:column;justify-content:flex-end;padding:18px 18px 22px;background:center/cover;overflow-y:auto}
+.layer.on{display:flex;animation:in .45s ease}
+.layer::before{content:"";position:absolute;inset:0;background:linear-gradient(#16060700 15%,#160607d9 55%,#160607 78%);z-index:-1}
+.layer>*{position:relative}
+@keyframes in{from{opacity:0;transform:scale(1.03)}to{opacity:1;transform:none}}
+h1{font:italic 700 clamp(27px,7.4vw,36px)/1.08 'Playfair Display',serif;margin:0 0 10px;text-wrap:balance;text-shadow:0 2px 14px #000}
+.layer p{margin:0 0 12px;color:var(--muted)}
+.tiers{list-style:none;margin:0 0 14px;padding:0;display:grid;gap:5px}
+.tiers li{display:flex;gap:10px;align-items:center;background:#ffffff12;border:1px solid #ffffff1f;border-radius:12px;padding:7px 12px;font-size:14px}
+.tiers b{min-width:58px;color:var(--gold)}
+.btn{display:block;width:100%;min-height:54px;border:0;border-radius:16px;font:800 18px Manrope,sans-serif;color:#fff;cursor:pointer;text-align:center;text-decoration:none;line-height:54px;background:linear-gradient(#ff5145,#c3151f);box-shadow:0 8px 24px #e3262f66,inset 0 1px 0 #ffffff66}
+.btn.wa{background:linear-gradient(#36d66f,#16a34a);box-shadow:0 8px 24px #16a34a55,inset 0 1px 0 #ffffff66}
+.btn:focus-visible,.link:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.link{background:none;border:0;color:var(--gold);font:700 15px Manrope;text-decoration:underline;min-height:44px;cursor:pointer;width:100%}
+.prize{padding:16px;border-radius:20px;border:2px solid var(--gold);background:linear-gradient(#3a0d0fcc,#1e0708cc);margin-bottom:12px;box-shadow:0 0 30px #f6c45333}
+.prize small{color:var(--muted);font-size:13px;display:block}
+.prize strong{display:block;font-size:24px;line-height:1.2;margin:4px 0;color:#fff}
+.prize code{font:800 17px Manrope;color:var(--gold);letter-spacing:1px}
+.demo{font-size:13px;color:var(--muted);text-align:center;margin:10px 0 0}
+.demo a{color:var(--gold)}
+.niches{display:flex;gap:8px;justify-content:center;margin-top:10px;flex-wrap:wrap}
+.niches a{font-size:13px;color:var(--ink);padding:7px 13px;border-radius:20px;background:#ffffff1a;text-decoration:none}
+.niches a.cur{background:var(--gold);color:#2a0708;font-weight:800}
+.load{position:absolute;inset:0;z-index:9;display:grid;place-items:center;background:var(--bg);font-weight:700;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){.layer.on{animation:none}}
+</style>
+</head>
+<body>
+<div class="blur"></div>
+<div class="app" id="app">
+  <div class="photo"></div>
+  <canvas id="cv"></canvas>
+  <div class="hud">
+    <div class="top"><span id="shop">Ваша кофейня</span><span class="moves"><b id="mv">20</b><small>ходов</small></span></div>
+    <div class="bar" aria-label="Сколько игрушек собрано"><div class="fill" id="fill"></div><div class="tick" style="left:33%"></div><div class="tick" style="left:66%"></div></div>
+    <div class="lab"><span id="cnt">Собрано 0</span><span>40 подарок</span><span>80 сюрприз</span><span>120 главный</span></div>
+  </div>
+  <div class="toast" id="toast"></div>
+  <div class="combo" id="combo"></div>
+
+  <div class="layer on" id="start" style="background-image:url(goat.jpg)">
+    <h1>Собери три — и Огненная Коза откроет подарок</h1>
+    <p>Меняйте местами соседние игрушки: три одинаковые в ряд исчезают. Собрали четыре или пять — получите ещё ход. У вас 20 ходов.</p>
+    <ul class="tiers" id="tiers"></ul>
+    <button class="btn" id="play" type="button">Играть</button>
+    <div class="niches" id="niches"></div>
+  </div>
+
+  <div class="layer" id="end" style="background-image:url(goatgift.jpg)">
+    <h1 id="eTitle">Собрано 96 игрушек!</h1>
+    <div class="prize"><small>Коза дарит вам</small><strong id="ePrize">—</strong><code id="eCode">NY27-0000</code><small>Покажите этот экран администратору или напишите в WhatsApp. Действует до 10 января.</small></div>
+    <a class="btn wa" id="wa" href="#" target="_blank" rel="noopener">Забрать подарок в WhatsApp</a>
+    <button class="link" id="again" type="button">Сыграть ещё раз и собрать 120</button>
+    <p class="demo">Демо для бизнеса: такая игра с вашим логотипом, фото и подарками за 24 часа. Сотрудникам ничего делать не нужно. WhatsApp <a href="https://wa.me/77781436982" target="_blank" rel="noopener">+7 778 143 69 82</a></p>
+  </div>
+  <div class="load" id="load">Достаём игрушки…</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+{
+const WA='77781436982',GOAL=[40,80,120],MOVES=20;
+const N={
+ coffee:{label:'Кофейня',shop:'Ваша кофейня',p:['Сироп в подарок','Второй напиток −50%','Десерт к кофе бесплатно','Напиток + десерт бесплатно']},
+ salon:{label:'Салон',shop:'Ваш салон',p:['−10% на любую услугу','Дизайн на 2 ногтя в подарок','−25% на новогодний маникюр','Маникюр с покрытием бесплатно']},
+ barber:{label:'Барбершоп',shop:'Ваш барбершоп',p:['Укладка в подарок','Камуфляж бороды −50%','−25% на стрижку','Стрижка бесплатно']},
+ kids:{label:'Детский центр',shop:'Ваш детский центр',p:['Сладкий подарок','Пробное занятие бесплатно','−25% на абонемент','Месяц занятий −50%']},
+ fit:{label:'Фитнес',shop:'Ваш фитнес-клуб',p:['Протеиновый коктейль','Пробная тренировка бесплатно','−25% на абонемент','Месяц занятий −50%']},
+ flowers:{label:'Цветы',shop:'Ваш цветочный',p:['Открытка в подарок','Упаковка бесплатно','−20% на букет','Букет из 15 роз −50%']}};
+const $=id=>document.getElementById(id);
+let key=(location.hash||'#coffee').slice(1);if(!N[key])key='coffee';let C=N[key];
+function applyNiche(){$('shop').textContent=C.shop;
+ $('tiers').innerHTML=[['всем',0],['40',1],['80',2],['120',3]].map(([t,i])=>`<li><b>${t}</b><span>${C.p[i]}</span></li>`).join('');
+ $('niches').innerHTML=Object.entries(N).map(([k,v])=>`<a href="#${k}" class="${k===key?'cur':''}">${v.label}</a>`).join('');}
+applyNiche();addEventListener('hashchange',()=>{const k=location.hash.slice(1);if(N[k]){key=k;C=N[k];applyNiche();}});
+
+if(!window.THREE){$('load').textContent='Не удалось загрузить игру. Обновите страницу.';}
+else{
+const T=THREE,cv=$('cv'),app=$('app');
+const R=new T.WebGLRenderer({canvas:cv,antialias:true,alpha:true});
+R.setPixelRatio(Math.min(devicePixelRatio||1,2));R.outputEncoding=T.sRGBEncoding;R.toneMapping=T.ACESFilmicToneMapping;R.toneMappingExposure=.95;
+const S=new T.Scene(),cam=new T.PerspectiveCamera(30,1,1,100);cam.position.set(0,0,30);
+S.add(new T.HemisphereLight(0xfff1dc,0x3a0b0b,.55));
+const sun=new T.DirectionalLight(0xffe2b0,1.2);sun.position.set(-5,8,10);S.add(sun);
+const rim=new T.DirectionalLight(0x9fd8ff,.7);rim.position.set(6,-5,6);S.add(rim);
+const phys=(o)=>new T.MeshPhysicalMaterial(Object.assign({clearcoat:1,clearcoatRoughness:.04,envMapIntensity:2.2},o));
+const M={red:phys({color:0xc0000f,metalness:.35,roughness:.12}),gold:phys({color:0xffcf6a,emissive:0x3a2200,metalness:1,roughness:.12}),
+ blue:phys({color:0x0050ff,metalness:.4,roughness:.1}),green:phys({color:0x00813a,metalness:.35,roughness:.16}),
+ silver:phys({color:0xf2f4ff,metalness:1,roughness:.08}),purple:phys({color:0x8a10ff,metalness:.4,roughness:.12}),
+ glass:new T.MeshPhysicalMaterial({color:0x120203,roughness:.25,metalness:0,clearcoat:1,transparent:true,opacity:.78,envMapIntensity:.4}),
+ cell:new T.MeshPhysicalMaterial({color:0xffffff,roughness:.3,transparent:true,opacity:.05})};
+const pm=new T.PMREMGenerator(R);
+new T.TextureLoader().load('goat.jpg',t=>{t.mapping=T.EquirectangularReflectionMapping;t.encoding=T.sRGBEncoding;const e=pm.fromEquirectangular(t).texture;for(const m of Object.values(M))m.envMap=e,m.needsUpdate=true;$('load').style.display='none';},undefined,()=>{$('load').style.display='none'});
+
+// token shapes
+const sph=new T.SphereGeometry(.36,40,28),capG=new T.CylinderGeometry(.08,.08,.1,16),ringG=new T.TorusGeometry(.05,.015,8,16);
+function starGeo(){const s=new T.Shape();for(let i=0;i<10;i++){const r=i%2?.18:.42,a=Math.PI/2+i*Math.PI/5;i?s.lineTo(Math.cos(a)*r,Math.sin(a)*r):s.moveTo(Math.cos(a)*r,Math.sin(a)*r);}
+ const g=new T.ExtrudeGeometry(s,{depth:.14,bevelEnabled:true,bevelThickness:.06,bevelSize:.05,bevelSegments:3});g.center();return g;}
+function heartGeo(){const s=new T.Shape();s.moveTo(0,-.36);s.bezierCurveTo(-.5,-.02,-.36,.36,0,.16);s.bezierCurveTo(.36,.36,.5,-.02,0,-.36);
+ const g=new T.ExtrudeGeometry(s,{depth:.16,bevelEnabled:true,bevelThickness:.07,bevelSize:.06,bevelSegments:4,curveSegments:16});g.center();return g;}
+const bellG=new T.LatheGeometry([[0,.3],[.08,.3],[.14,.24],[.18,.05],[.24,-.15],[.34,-.26],[.34,-.3],[0,-.3]].map(([x,y])=>new T.Vector2(x,y)),32);
+const boxG=new T.BoxGeometry(.62,.62,.62),rbV=new T.BoxGeometry(.14,.66,.66),rbH=new T.BoxGeometry(.66,.14,.66),bowG=new T.TorusGeometry(.1,.04,8,20);
+const SG=starGeo(),HG=heartGeo();
+const TYPES=6;
+function makeToken(t){const g=new T.Group();
+ if(t===0){g.add(new T.Mesh(sph,M.red));const c=new T.Mesh(capG,M.gold);c.position.y=.38;g.add(c);const r=new T.Mesh(ringG,M.gold);r.position.y=.46;g.add(r);}
+ if(t===1){g.add(new T.Mesh(SG,M.gold));}
+ if(t===2){g.add(new T.Mesh(sph,M.blue));const c=new T.Mesh(capG,M.silver);c.position.y=.38;g.add(c);const r=new T.Mesh(ringG,M.silver);r.position.y=.46;g.add(r);}
+ if(t===3){g.add(new T.Mesh(boxG,M.green),new T.Mesh(rbV,M.gold),new T.Mesh(rbH,M.gold));const b1=new T.Mesh(bowG,M.gold);b1.position.set(-.08,.36,0);b1.rotation.y=.6;const b2=b1.clone();b2.position.x=.08;b2.rotation.y=-.6;g.add(b1,b2);g.scale.setScalar(.92);}
+ if(t===4){g.add(new T.Mesh(bellG,M.silver));const r=new T.Mesh(ringG,M.red);r.position.y=.34;g.add(r);}
+ if(t===5){g.add(new T.Mesh(HG,M.purple));}
+ g.userData.spin=Math.random()*6;return g;}
+
+const COLS=7,ROWS=8;let grid=[],board=new T.Group();S.add(board);
+const frame=new T.Mesh(new T.BoxGeometry(COLS+.4,ROWS+.4,.2),M.glass);frame.position.z=-.6;board.add(frame);
+const cellG=new T.PlaneGeometry(.94,.94);
+for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){const m=new T.Mesh(cellG,M.cell);m.position.set(...pos(r,c),-.48);board.add(m);}
+function pos(r,c){return [c-(COLS-1)/2,r-(ROWS-1)/2];}
+function size(){const w=app.clientWidth,h=app.clientHeight;R.setSize(w,h,false);cam.aspect=w/h;
+ const needW=COLS+.9,needH=ROWS+3.6,fitH=needH/(2*Math.tan(T.MathUtils.degToRad(15))),fitW=needW/(2*Math.tan(T.MathUtils.degToRad(15))*cam.aspect);
+ cam.position.z=Math.max(fitH,fitW);cam.updateProjectionMatrix();
+ const vis=2*cam.position.z*Math.tan(T.MathUtils.degToRad(15));board.position.y=-vis*.06;}
+new ResizeObserver(size).observe(app);size();
+
+// tweens
+const tw=[];function anim(d,f){return new Promise(res=>tw.push({d,f,t:0,res}));}
+const ease=k=>1-Math.pow(1-k,3);
+const fx=[],sparkG=new T.OctahedronGeometry(.07,0);
+function burst(x,y,mat){for(let i=0;i<7;i++){const m=new T.Mesh(sparkG,i%2?M.gold:mat);m.position.set(x,y,.3);board.add(m);fx.push({m,v:new T.Vector3((Math.random()-.5)*6,(Math.random()-.2)*6,Math.random()*4),t:0});}}
+const MATS=[M.red,M.gold,M.blue,M.green,M.silver,M.purple];
+
+function rnd(){return Math.floor(Math.random()*TYPES);}
+function fill(){for(const row of grid)for(const x of row)if(x)board.remove(x.m);grid=[];
+ for(let r=0;r<ROWS;r++){grid[r]=[];for(let c=0;c<COLS;c++){let t;do t=rnd();while((c>1&&grid[r][c-1].t===t&&grid[r][c-2].t===t)||(r>1&&grid[r-1][c].t===t&&grid[r-2][c].t===t));
+  const m=makeToken(t);const[x,y]=pos(r,c);m.position.set(x,y+ROWS,0);board.add(m);grid[r][c]={t,m};}}
+ if(!hasMove())return fill();
+ return anim(.7,k=>{for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){const[x,y]=pos(r,c);grid[r][c].m.position.y=y+ROWS*(1-ease(Math.min(1,k*1.3-r*.03)));}});}
+function matches(){const set=new Set();let big=0;
+ for(let r=0;r<ROWS;r++){let s=0;for(let c=1;c<=COLS;c++){if(c<COLS&&grid[r][c]&&grid[r][s]&&grid[r][c].t===grid[r][s].t)continue;if(c-s>=3){for(let k=s;k<c;k++)set.add(r*COLS+k);if(c-s>=4)big++;}s=c;}}
+ for(let c=0;c<COLS;c++){let s=0;for(let r=1;r<=ROWS;r++){if(r<ROWS&&grid[r][c]&&grid[s][c]&&grid[r][c].t===grid[s][c].t)continue;if(r-s>=3){for(let k=s;k<r;k++)set.add(k*COLS+c);if(r-s>=4)big++;}s=r;}}
+ return {set,big};}
+function swapData(a,b){const t=grid[a.r][a.c];grid[a.r][a.c]=grid[b.r][b.c];grid[b.r][b.c]=t;}
+function hasMove(){for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)for(const[dr,dc]of[[0,1],[1,0]]){const r2=r+dr,c2=c+dc;if(r2>=ROWS||c2>=COLS)continue;
+ swapData({r,c},{r:r2,c:c2});const ok=matches().set.size>0;swapData({r,c},{r:r2,c:c2});if(ok)return true;}return false;}
+function animSwap(a,b){const ma=grid[a.r][a.c].m,mb=grid[b.r][b.c].m,pa=pos(a.r,a.c),pb=pos(b.r,b.c);
+ return anim(.18,k=>{k=ease(k);ma.position.x=pa[0]+(pb[0]-pa[0])*k;ma.position.y=pa[1]+(pb[1]-pa[1])*k;mb.position.x=pb[0]+(pa[0]-pb[0])*k;mb.position.y=pb[1]+(pa[1]-pb[1])*k;ma.position.z=Math.sin(k*Math.PI)*.6;});}
+
+let state='menu',moves=MOVES,collected=0,busy=false,sel=null,passed=[0,0];
+function ui(){$('mv').textContent=moves;$('cnt').textContent='Собрано '+collected;$('fill').style.width=Math.min(100,collected/GOAL[2]*100)+'%';}
+function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),1500);}
+function combo(t){const e=$('combo');e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),900);}
+async function resolve(){let chain=0;
+ for(;;){const{set,big}=matches();if(!set.size)break;chain++;
+  const cells=[...set].map(i=>({r:Math.floor(i/COLS),c:i%COLS}));
+  await anim(.22,k=>{for(const{r,c}of cells){const m=grid[r][c].m;m.scale.setScalar(1+k*.35);m.rotation.z=k*1.5;}});
+  for(const{r,c}of cells){const g=grid[r][c];const[x,y]=pos(r,c);burst(x,y,MATS[g.t]);board.remove(g.m);grid[r][c]=null;}
+  collected+=cells.length;
+  if(big){moves+=big;toast('Отлично! +'+big+' ход');}
+  if(chain>1)combo(['','','Каскад!','Супер!','Волшебно!','Невероятно!'][Math.min(5,chain)]);
+  for(let i=0;i<2;i++)if(collected>=GOAL[i]&&!passed[i]){passed[i]=1;toast(i?'Сюрприз открыт! Дальше главный приз':'Подарок открыт! Дальше сюрприз');}
+  ui();
+  // collapse
+  const moving=[];
+  for(let c=0;c<COLS;c++){let w=0;for(let r=0;r<ROWS;r++){if(grid[r][c]){if(r!==w){grid[w][c]=grid[r][c];grid[r][c]=null;moving.push({g:grid[w][c],from:pos(r,c)[1],to:pos(w,c)[1]});}w++;}}
+   for(let r=w,n=0;r<ROWS;r++,n++){const t=rnd(),m=makeToken(t),[x,y]=pos(r,c),from=pos(ROWS-1,c)[1]+1.2+n;m.position.set(x,from,0);board.add(m);grid[r][c]={t,m};moving.push({g:grid[r][c],from,to:y});}}
+  await anim(.32,k=>{k=ease(k);for(const mv of moving)mv.g.m.position.y=mv.from+(mv.to-mv.from)*k;});
+  if(collected>=GOAL[2])break;
+ }
+ if(collected>=GOAL[2])return finish();
+ if(!hasMove()){toast('Перемешиваем игрушки');await fill();}
+}
+async function trySwap(a,b){if(busy||state!=='play')return;busy=true;sel=null;
+ await animSwap(a,b);swapData(a,b);
+ if(!matches().set.size){await animSwap(a,b);swapData(a,b);busy=false;return;}
+ moves--;ui();await resolve();busy=false;
+ if(state==='play'&&moves<=0)setTimeout(finish,500);}
+function finish(){if(state==='end')return;state='end';
+ const tier=collected>=GOAL[2]?3:collected>=GOAL[1]?2:collected>=GOAL[0]?1:0,prize=C.p[tier],code='NY27-'+Math.floor(1000+Math.random()*9000);
+ $('eTitle').textContent=tier===3?'120 игрушек! Главный приз ваш':`Собрано ${collected} игрушек!`;
+ $('ePrize').textContent=prize;$('eCode').textContent=code;
+ $('wa').href='https://wa.me/'+WA+'?text='+encodeURIComponent(`Здравствуйте! Я сыграл(а) в «Собери три» с Огненной Козой и выиграл(а): ${prize}. Код ${code}. Хочу забрать подарок!`);
+ $('again').style.display=tier===3?'none':'';setTimeout(()=>$('end').classList.add('on'),600);}
+async function newGame(){state='play';moves=MOVES;collected=0;passed=[0,0];ui();busy=true;await fill();busy=false;}
+
+// input: swipe or tap-tap
+const ray=new T.Raycaster(),plane=new T.Plane(new T.Vector3(0,0,1),0);let down=null;
+function cell(e){const rc=cv.getBoundingClientRect();ray.setFromCamera(new T.Vector2((e.clientX-rc.left)/rc.width*2-1,-(e.clientY-rc.top)/rc.height*2+1),cam);
+ const p=new T.Vector3();ray.ray.intersectPlane(plane,p);p.y-=board.position.y;const c=Math.round(p.x+(COLS-1)/2),r=Math.round(p.y+(ROWS-1)/2);return r>=0&&r<ROWS&&c>=0&&c<COLS?{r,c}:null;}
+cv.addEventListener('pointerdown',e=>{if(state!=='play'||busy)return;const k=cell(e);if(!k)return;down={k,x:e.clientX,y:e.clientY};
+ if(sel&&Math.abs(sel.r-k.r)+Math.abs(sel.c-k.c)===1){const a=sel;down=null;trySwap(a,k);return;}sel=k;});
+cv.addEventListener('pointermove',e=>{if(!down||busy)return;const dx=e.clientX-down.x,dy=e.clientY-down.y;if(Math.hypot(dx,dy)<22)return;
+ const k=down.k,b=Math.abs(dx)>Math.abs(dy)?{r:k.r,c:k.c+Math.sign(dx)}:{r:k.r-Math.sign(dy),c:k.c};down=null;
+ if(b.r>=0&&b.r<ROWS&&b.c>=0&&b.c<COLS)trySwap(k,b);});
+addEventListener('pointerup',()=>{down=null;});
+
+let last=performance.now();
+function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;
+ for(let i=tw.length-1;i>=0;i--){const a=tw[i];a.t+=dt;const k=Math.min(1,a.t/a.d);a.f(k);if(k>=1){tw.splice(i,1);a.res();}}
+ const t=now/1000;for(const row of grid)for(const g of row){if(!g)continue;const m=g.m;m.rotation.y=Math.sin(t*1.2+m.userData.spin)*.5;
+  if(sel&&grid[sel.r]&&grid[sel.r][sel.c]===g&&!busy){m.scale.setScalar(1.12+Math.sin(t*8)*.05);}else if(!busy&&m.scale.x!==1&&m.rotation.z===0)m.scale.setScalar(1);}
+ for(let i=fx.length-1;i>=0;i--){const f=fx[i];f.t+=dt;f.v.y-=10*dt;f.m.position.addScaledVector(f.v,dt);f.m.rotation.x+=dt*9;f.m.scale.setScalar(Math.max(0,1-f.t/.8));if(f.t>.8){board.remove(f.m);fx.splice(i,1);}}
+ R.render(S,cam);requestAnimationFrame(loop);}
+fill();requestAnimationFrame(loop);
+$('play').onclick=()=>{$('start').classList.remove('on');newGame();};
+$('again').onclick=()=>{$('end').classList.remove('on');newGame();};
+}
+}
+</script>
+</body>
+</html>
