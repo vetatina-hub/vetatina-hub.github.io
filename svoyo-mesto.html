@@ -90,6 +90,20 @@ details summary{cursor:pointer;color:var(--gold);font-weight:700}
 .amt{text-align:center;font-size:15px;margin:-4px 0 6px;color:var(--tx)}.amt b{color:var(--gold)}
 .paid{display:block;text-align:center;font-size:14px;color:var(--gold);margin:-4px 0 12px}
 .space{border:1px dashed var(--gold);border-radius:12px;padding:14px;margin:8px 0}.space b{color:var(--gold)}.space p{font-size:15px;margin:6px 0 10px}.space .row{margin:0}
+.lif{margin:10px 0 0}.lif summary{color:var(--gold);font-size:15px;cursor:pointer}.lif ul{margin:8px 0 0}
+.cardx{background:#1d3260;border:1px solid #3d5a92;border-radius:14px;padding:16px 16px;margin:0 0 14px;font-size:17px;line-height:1.6}
+.cardx.gold{border-color:var(--gold);background:linear-gradient(180deg,#2a3a68,#1d3260)}
+.cardx p{margin:0 0 10px}.cardx p:last-child{margin:0}
+.ttop{font:700 21px/1.3 Georgia,serif;color:#fff;text-align:center;margin:0 0 6px}
+.pt.big{font-size:30px;text-align:center;margin:4px 0 10px}
+.tags{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:0 0 16px}.tags span{background:#24396b;border:1px solid #4a6aa8;border-radius:20px;padding:5px 12px;font-size:14px;color:#fff}
+.sh{display:block;font:700 18px Georgia,serif;color:var(--gold);margin:0 0 10px}
+.ul2{list-style:none;padding:0;margin:0 0 14px}.ul2 li{background:#1d3260;border-radius:12px;padding:11px 13px;margin:0 0 8px;font-size:16px;line-height:1.5;color:#e6eefc}.ul2 li b{color:#fff}
+.res2{background:linear-gradient(90deg,#c9a84c,#e8cf7a);color:#162545;font:700 17px/1.4 Georgia,serif;text-align:center;border-radius:12px;padding:13px;margin:0 0 14px}
+.pricebox{text-align:center;background:#1d3260;border:1px solid var(--gold);border-radius:14px;padding:16px;margin:16px 0 4px}.pricebox .pl{color:var(--dim);font-size:15px}.pricebox .pv{font:700 36px Georgia,serif;color:var(--gold);margin:2px 0 8px}.pricebox .pc{font-size:16px;color:#fff;line-height:1.5}
+.gnote{text-align:center;font-size:16px;color:#fff;background:#24396b;border-radius:12px;padding:11px;margin:4px 0 14px}
+.gift{font-size:16px!important;line-height:1.55}.gift p{color:#e8fff0}
+.find{padding:16px 16px}.find p{font-size:17px;line-height:1.55}
 </style>
 </head>
 <body>
@@ -272,7 +286,7 @@ h.addEventListener("pointerdown",e=>{e.preventDefault();if(s>=1)return;const t0=
 ["pointerup","pointerleave","pointercancel"].forEach(ev=>h.addEventListener(ev,stop));h.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){s=1;done()}})}
 
 /* ----- заключение ----- */
-const card=(f,first)=>`<div class="find ${first?"first":""}"><h3>${esc(f.t)}</h3><p>${esc(f.x)}${f.s?" "+SOFT:""}</p>${f.i?`<p class="inner">Внутри звучит: ${esc(f.i)}</p>`:""}${f.l.length?`<div class="fig">Как это у тебя в жизни</div><ul>${f.l.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:""}</div>`;
+const card=(f,first)=>`<div class="find ${first?"first":""}"><h3>${esc(f.t)}</h3><p>${esc(f.x)}${f.s?" "+SOFT:""}</p>${f.i?`<p class="inner">Внутри звучит: ${esc(f.i)}</p>`:""}${f.l.length?`<details class="lif"><summary>👉 Как это у тебя в жизни</summary><ul>${f.l.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></details>`:""}</div>`;
 function summary(){const{bad,good}=decode(),P=place(),pl=PLACE[P.p],lay=lifeLayout(P.p);
 const text=`ДИАГНОСТИКА ЖИЗНИ · «Своё место»\nЗапрос: ${S.ask.trim()} (${S.area})\n\nЧТО ПОКАЗАЛО ПОЛЕ\n${bad.slice(0,2).map(f=>"• "+f.t+"\n"+f.x+(f.s?" "+SOFT:"")+(f.i?"\nВнутри звучит: "+f.i:"")).join("\n\n")}${bad.length>2?"\n\nЕщё сигналов в твоём поле: "+(bad.length-2)+".":""}${good.length?"\n\nРЕСУРС\n"+good.map(f=>"• "+f.t).join("\n"):""}\n\nКАК ТЫ СТОИШЬ В ЖИЗНИ: «${pl.n}»\n${pl.t}. ${pl.w}\n${P.mine.length?"Ты сама отметила, что "+P.mine.join("; ")+".\n":""}${P.p!=="n"?whyPlain(P,lay):pl.c}\n${S.yrs!==null?`\nЭто с тобой ${YRT[S.yrs]}. Уже стоило: ${S.cost.map(i=>COSTT[i]).join(", ")}.\n`:""}\n\n© Венера Татина. Методика и тексты защищены, копирование запрещено.`;return{text,bad,good,P,pl,lay}}
 const TURN={o:"желание научить маму или папу, спасти их, решить за них",c:"обида и претензия к родителям",k:"ожидание, что мама и папа дадут, помогут, решат за тебя"};
@@ -325,7 +339,7 @@ function scAnim(to,cb){cancelAnimationFrame(SC.raf);const from=SC.t,t0=performan
 let SCcap0="";
 function sceneStart(){if(!document.getElementById("scn"))return;SC.t=0;scSet(0);const o=new IntersectionObserver(es=>{if(es[0].isIntersecting){o.disconnect();setTimeout(()=>{scAnim(1);vib(20)},2600)}},{threshold:.5});o.observe(document.getElementById("scn"))}
 function sceneFlip(){const b=document.getElementById("scbtn"),c=document.getElementById("sccap"),hn=document.getElementById("schint");SCcap0=SCcap0||c.textContent;const goHome=SC.t>.5;
-if(goHome){scAnim(0,()=>{for(let i=0;i<SC.n;i++)setTimeout(()=>chime(),i*180)});b.textContent="Вернуть, как сейчас";b.classList.remove("glow");c.innerHTML="<b>Ты на своём месте.</b> Река рода течёт в тебя, а через тебя — в твою жизнь. Всё, на что ты смотришь, наполняется силой.";hn.hidden=true;const br=document.getElementById("bridge");if(br){br.hidden=false;br.classList.add("fade");setTimeout(()=>br.scrollIntoView({behavior:"smooth",block:"start"}),1900)}vib([20,40,60])}
+if(goHome){scAnim(0,()=>{for(let i=0;i<SC.n;i++)setTimeout(()=>chime(),i*180)});b.textContent="Вернуть, как сейчас";b.classList.remove("glow");c.innerHTML="<b>Ты на своём месте.</b> Река рода течёт в тебя, а через тебя — в твою жизнь. Всё, на что ты смотришь, наполняется силой.";hn.hidden=true;const br=document.getElementById("bridge");if(br){br.hidden=false;br.classList.add("fade");setTimeout(()=>br.scrollIntoView({behavior:"smooth",block:"start"}),3400)}vib([20,40,60])}
 else{scAnim(1);b.textContent="✦ Встать на своё место";b.classList.add("glow");c.textContent=SCcap0;hn.hidden=false;vib(20)}}
 /* ===== ПОДАРОК: 24 часа от ПЕРВОГО открытия экрана 3. Время хранится в localStorage и не сбрасывается при перезагрузке и повторном заходе ===== */
 const GIFTH=24,GIFTK="sm_gift_t0";
@@ -360,27 +374,25 @@ if(!S.rev)return `<span class="badge">ТВОЯ РАСШИФРОВКА</span><h2 
 const W=whyParts(P,lay),CR=`<p class="dim" style="text-align:center;font-size:13px;margin-top:18px">© Венера Татина. Методика и тексты защищены. Копирование запрещено.</p>`;
 /* ---- экран 1: расшифровка ---- */
 if(S.rs===0)return rsHead()+`<div class="flip"><span class="badge">ТВОЁ ПОЛЕ</span><div class="schw big">${roomSVG()}</div></div>
-<div class="note">Если сейчас подступили слёзы, это нормально. Так бывает, когда видишь то, что давно чувствовала.</div>
-<h2>Что показала твоя картина</h2>
+<h2 style="text-align:center">🔍 Что показала твоя картина</h2>
+<p class="dim" style="text-align:center">Два главных сигнала. Нажми «Как это у тебя в жизни», чтобы узнать себя.</p>
 ${cardsBy(bad.slice(0,2),good,true)||`<div class="note">Твоё поле спокойное: мама и папа на своих местах.</div>`}
 ${bad.length>2?`<button class="btn ghost" id="fullb" onclick="this.hidden=true;const e=document.getElementById('fullr');e.hidden=false;e.classList.add('fade');vib(20)">Показать ещё ${bad.length-2} ${bad.length-2<5?"сигнала":"сигналов"} ↓</button><div id="fullr" hidden>${cardsBy(bad.slice(2),good,false)}</div>`:""}
-<div class="note">Это не диагноз, а карта: сигнал, а не приговор.</div>
+<div class="note">💛 Если подступили слёзы — это нормально. Это не диагноз, а карта: сигнал, а не приговор.</div>
 <p class="phrase" style="font-size:19px;margin-top:22px">А теперь посмотри, что это делает<br>с твоей жизнью.</p>
 <button class="btn glow" onclick="rsGo(1)">Дальше: моя жизнь →</button>`+CR;
 /* ---- экран 2: жизнь и река рода ---- */
-if(S.rs===1)return rsHead()+`<h2 style="text-align:center">Так течёт жизнь, когда ты на своём месте</h2>
-<p style="text-align:center">За спиной мама, папа и весь род. Их сила идёт к тебе, как большая река.<br>А через тебя — в деньги, дело, семью и здоровье.</p>
-<div class="schw big" style="margin:0 -6px 8px">${sceneSVG(P)}</div>
-<p class="sccap" id="sccap">Своё место — пусто.</p>
-<span class="badge">${esc(pl.n.toUpperCase())}</span>
-<p class="phrase">Сейчас ты развернулась лицом к маме и папе и несёшь их ношу. А к своей жизни стоишь спиной.</p>
-<p style="text-align:center">В деньгах это часто видно так: деньги приходят и уходят — на других, на срочное, мимо тебя.</p>
-<div class="box">${MORET[S.more]||MORET[1]} <b>Можно иначе. И начать можно с малого.</b></div>
-<button class="btn glow" id="scbtn" onclick="sceneFlip()">✦ Встать на своё место</button>
-<p class="hint" id="schint">нажми — и посмотри, что изменится</p>
+if(S.rs===1)return rsHead()+`<h2 style="text-align:center">🌊 Так течёт жизнь на своём месте</h2>
+<div class="cardx"><p>👨‍👩‍👧 За спиной — мама, папа и весь род. Их сила идёт к тебе, как большая река.</p><p>✨ А через тебя — в деньги, дело, семью и здоровье.</p></div>
+<div class="cardx gold"><p style="text-align:center"><span class="badge" style="margin:0 auto 10px">${esc(pl.n.toUpperCase())}</span></p><p>↩️ Сейчас ты развернулась лицом к маме и папе и несёшь их ношу. <b>А к своей жизни стоишь спиной.</b></p><p>💸 В деньгах это видно так: деньги приходят и уходят — на других, на срочное, мимо тебя.</p></div>
+<div class="cardx"><p>${MORET[S.more]||MORET[1]}</p><p><b>🌱 Можно иначе. И начать можно с малого.</b></p></div>
+<p class="ttop">Посмотри, что сейчас происходит 👇</p>
+<div class="schw big" id="scwrap" style="margin:0 -6px 8px">${sceneSVG(P)}</div>
+<div class="cardx" style="text-align:center"><p class="sccap" id="sccap" style="margin:0;color:#fff;font-style:normal">Своё место — пусто.</p></div>
+<button class="btn glow" id="scbtn" onclick="document.getElementById('scwrap').scrollIntoView({behavior:'smooth',block:'center'});setTimeout(sceneFlip,450)">✦ Встать на своё место</button>
+<p class="hint" id="schint">нажми — и смотри на схему ☝️</p>
 <div id="bridge" hidden><div class="bigplace"><span>ТВОЁ МЕСТО</span></div>
-<p class="phrase" style="font-size:19px">На схеме ты встала одной кнопкой.<br>В жизни на своё место встают шагами.</p>
-<p style="text-align:center">Твой первый шаг я уже приготовила.</p>
+<div class="cardx" style="text-align:center"><p>🪜 На схеме ты встала одной кнопкой.<br><b>В жизни на своё место встают шагами.</b></p><p>🎁 Твой первый шаг я уже приготовила.</p></div>
 <button class="btn glow" onclick="rsGo(2)">Показать мой первый шаг →</button></div>
 <button class="btn ghost" onclick="rsGo(0)">← К расшифровке</button>`+CR;
 /* ---- экран 3: путь ---- */
@@ -388,36 +400,37 @@ setTimeout(giftTick,60);const gOn=giftLeft()>0;
 const otz=`<div id="otz"><div class="fig" style="text-align:center;margin:14px 0 8px">Что пишут ученицы после Денежного Взлёта</div>${OTZ.map(f=>`<img src="${f}" alt="Отзыв ученицы после Денежного Взлёта" loading="lazy" decoding="async" onerror="const w=this.parentNode;this.remove();if(!w.querySelector('img'))w.hidden=true" style="display:block;width:100%;height:auto;border-radius:12px;border:1px solid var(--bord);margin:0 0 12px">`).join("")}</div>`;
 const debt=(S.life.mon||[]).includes("debt");
 const UL=`style="margin:0 0 12px;padding-left:20px"`;
-const mainCTA=`<div class="path p1"><span class="stn">ТВОЙ ПЕРВЫЙ ШАГ</span>
-<div class="pt">💰 Денежный Взлёт</div><div class="pp">23 урока · в своём темпе · доступ сразу после оплаты</div>
-<p class="dim" style="font-size:14px;margin:0 0 10px">Курс Венеры Татиной, мастера разборов. На этом пути с 2008 года.</p>
-<p style="margin:0 0 6px"><b>За 23 урока ты:</b></p><ul ${UL}>
-<li>впервые увидишь всю правду о своих деньгах: сколько приходит, куда уходит и сколько ты должна — в одной картине;</li>
-<li>найдёшь, где деньги утекают незаметно, и закроешь эти дыры;</li>
-<li>${debt?"<b>получишь план, как закрывать долги</b>, и узнаешь, как договориться с банком или с человеком, которому должна":"получишь план на случай долгов и рассрочек — и перестанешь в них проваливаться"};</li>
-<li>поймёшь, что на самом деле мешало тебе в деньгах, и отдашь в пространство всё, что тянет тебя назад;</li>
-<li>с помощью ИИ найдёшь свои новые источники дохода — готовая подсказка уже внутри урока;</li>
-<li>начнёшь откладывать, и эти деньги станут неприкосновенными.</li></ul>
-<p style="margin:0 0 12px"><b>На выходе ты точно знаешь, как обращаться с деньгами: что делать каждый день, чтобы они приходили и оставались с тобой.</b></p>
-<div class="note" style="margin:0 0 12px">⏱ Это не бесконечный курс. Около 3 часов работы на всё: можно пройти за 1–3 вечера, прямо с телефона.</div>
+const mainCTA=`<div class="path p1"><span class="stn" style="text-align:center">✨ ТВОЙ ПЕРВЫЙ ШАГ ✨</span>
+<div class="pt big">💰 Денежный Взлёт</div>
+<div class="tags"><span>📚 23 урока</span><span>📱 с телефона</span><span>⚡ доступ сразу</span></div>
+<p class="dim" style="text-align:center;font-size:15px;margin:0 0 16px">Курс Венеры Татиной, мастера разборов · на этом пути с 2008 года</p>
+<b class="sh">За 23 урока ты:</b>
+<ul class="ul2">
+<li>👀 <b>увидишь правду о своих деньгах</b> — сколько приходит, куда уходит и сколько ты должна</li>
+<li>🕳️ <b>закроешь утечки</b>, через которые деньги уходили незаметно</li>
+<li>📋 ${debt?"<b>получишь план, как закрыть долги</b>, и научишься договариваться с банком и людьми":"<b>получишь план на случай долгов</b> и перестанешь в них проваливаться"}</li>
+<li>🔓 <b>поймёшь, что мешало</b> тебе в деньгах, и отпустишь это</li>
+<li>🤖 <b>найдёшь новые источники дохода</b> с помощью ИИ</li>
+<li>🐷 <b>начнёшь откладывать</b> — и эти деньги станут неприкосновенными</li></ul>
+<div class="res2">🏆 На выходе ты точно знаешь,<br>как обращаться с деньгами</div>
+<div class="note" style="text-align:center;font-size:16px">⏱ Около 3 часов на весь курс — это 1–3 вечера</div>
 ${otz}
-<div class="gift"${gOn?"":" hidden"}><b style="font:700 18px Georgia,serif;color:#fff">🎁 Подарок, если оплатишь в течение 24 часов: «Разговор с деньгами»</b><p style="margin:4px 0 0;color:#fff">Медитация ждёт тебя сразу после оплаты.</p>
-<p style="margin:6px 0">Медитация голосом Венеры. После неё в твоей жизни с деньгами начинают налаживаться процессы, которые годами стояли на месте. Деньги перестают быть для тебя чужими. В ней ты:</p>
-<ul style="margin:0 0 8px;padding-left:20px"><li>увидишь, какие у тебя отношения с деньгами на самом деле: близко они к тебе или отвернулись;</li><li>услышишь, что деньги хотят тебе сказать;</li><li>с уважением вернёшь маме, папе и роду их «деньги — это тяжело» и разрешишь себе жить с деньгами легче;</li><li>заключишь с деньгами новый договор и назовёшь цель, к которой вы теперь идёте вместе.</li></ul>
-<p style="margin:0 0 6px">Медитация запускает перемены в деньгах, а курс закрепляет их действиями.</p>
+<div class="gift"${gOn?"":" hidden"}><b style="font:700 19px Georgia,serif;color:#fff">🎁 Подарок при оплате за 24 часа</b>
+<p style="margin:8px 0 6px;font-size:17px"><b>Медитация «Разговор с деньгами»</b></p>
+<p style="margin:0 0 8px">После неё в жизни с деньгами начинают налаживаться процессы, которые годами стояли на месте. ✨</p>
 <span class="gtm">Подарок сохраняется ещё: <b>${giftTxt()}</b></span></div>
-<p style="text-align:center;margin:14px 0 0">Всё это — <b style="color:var(--gold);font-size:22px">${DVP} тг</b><br><span class="dim" style="font-size:15px">Посчитай, сколько денег незаметно ушло мимо тебя только за этот месяц.</span></p>
+<div class="pricebox"><div class="pl">Всё это —</div><div class="pv">${DVP} тг</div><div class="pc">💸 Посчитай, сколько денег незаметно ушло мимо тебя только за этот месяц</div></div>
 ${payBtn("dv","Забрать Денежный Взлёт · "+DVP+" тг","glow")}
-<p class="dim giftnote" style="text-align:center;font-size:14px;margin:0 0 10px"${gOn?"":" hidden"}>Не готова сейчас? Подарок держится 24 часа. Можно вернуться по этой же ссылке.</p>
-<div class="space"><b>Не готова пока брать курс?</b><p>Заходи в бесплатную группу «Пространство Трансформации». Побудь в ней, посмотри вживую, как проходят мои разборы, и поучаствуй в них сама.</p><div class="row"><a class="btn ghost" style="flex:1;margin-top:0" href="https://chat.whatsapp.com/JdXSf1uFlpwJZwUWBv8GbR" target="_blank" rel="noopener">WhatsApp</a><a class="btn ghost" style="flex:1;margin-top:0" href="https://t.me/+2v5c8znsaONjY2Fi" target="_blank" rel="noopener">Telegram</a></div></div>
-<details style="margin:0 0 14px"><summary>Сомневаешься? Ответы на главные вопросы</summary>
-<p style="margin:10px 0 6px"><b>«У меня долги, мне не до курсов».</b><br>Именно поэтому. Курс начинается со списка долгов и плана, как их закрыть. ${DVP} тг обычно меньше одного платежа по кредиту.</p>
-<p style="margin:0 0 6px"><b>«Нет времени».</b><br>Около 3 часов на весь курс, в своём темпе. Один урок — одно действие.</p>
-<p style="margin:0 0 6px"><b>«Я уже пробовала вести учёт, не получилось».</b><br>Здесь не просто таблица. Ты работаешь и с цифрами, и с тем, что внутри не даёт деньгам остаться.</p>
-<p style="margin:0"><b>«А вдруг это не для меня?»</b><br>Ты только что увидела в игре, почему деньги проходят мимо. Курс — первый шаг: порядок в цифрах и честный взгляд на то, что внутри.</p></details></div>`;
-return rsHead()+`<h2 style="text-align:center">Твой первый шаг на своё место</h2>
-${S.ask.trim()?`<div class="box">Ты написала в начале: <i>«${esc(S.ask.trim())}»</i>.<br>Дело не в том, что ты мало стараешься. Ты стоишь не на своём месте, и поэтому деньги идут мимо. Вернуть себе свои деньги — самый быстрый первый шаг.</div>`:""}
-<p style="text-align:center">Ты уже увидела главное. Теперь первый шаг. Начнём с денег: в них быстрее всего видно, где ты не на своём месте.</p>
+<div class="gnote giftnote"${gOn?"":" hidden"}>⏳ Не готова сейчас? Подарок ждёт 24 часа.<br>Вернись по этой же ссылке.</div>
+<details class="cardx" style="margin:0 0 14px"><summary style="color:var(--gold);font-weight:700">🤔 Сомневаешься? Ответы на главные вопросы</summary>
+<p style="margin:12px 0 10px">💳 <b>«У меня долги, мне не до курсов».</b><br>Именно поэтому. Курс начинается со списка долгов и плана, как их закрыть. ${DVP} тг — обычно меньше одного платежа по кредиту.</p>
+<p style="margin:0 0 10px">⏰ <b>«Нет времени».</b><br>Около 3 часов на весь курс, в своём темпе. Один урок — одно действие.</p>
+<p style="margin:0 0 10px">📒 <b>«Я уже пробовала вести учёт».</b><br>Здесь не просто таблица. Ты работаешь и с цифрами, и с тем, что внутри не даёт деньгам остаться.</p>
+<p style="margin:0">💭 <b>«А вдруг это не для меня?»</b><br>Ты только что увидела, почему деньги проходят мимо. Курс — первый шаг: порядок в цифрах и честный взгляд внутрь.</p></details>
+<div class="cardx" style="text-align:center"><p style="font:700 18px Georgia,serif;color:var(--gold)">🌸 Не готова пока брать курс?</p><p>Заходи в бесплатную группу «Пространство Трансформации». Посмотри вживую, как проходят мои разборы, и поучаствуй сама.</p><div class="row" style="margin:0"><a class="btn ghost" style="flex:1;margin-top:0" href="https://chat.whatsapp.com/JdXSf1uFlpwJZwUWBv8GbR" target="_blank" rel="noopener">💬 WhatsApp</a><a class="btn ghost" style="flex:1;margin-top:0" href="https://t.me/+2v5c8znsaONjY2Fi" target="_blank" rel="noopener">✈️ Telegram</a></div></div></div>`;
+return rsHead()+`<h2 style="text-align:center">🌟 Твой первый шаг на своё место</h2>
+${S.ask.trim()?`<div class="cardx"><p>📝 Ты написала в начале: <i>«${esc(S.ask.trim())}»</i></p><p>Дело не в том, что ты мало стараешься. <b>Ты стоишь не на своём месте — поэтому деньги идут мимо.</b></p></div>`:""}
+<div class="cardx gold" style="text-align:center"><p>💡 Ты уже увидела главное.</p><p><b>Начнём с денег:</b> в них быстрее всего видно, где ты не на своём месте.</p></div>
 ${mainCTA}
 <div style="border-top:1px solid var(--bord);margin-top:22px;padding-top:12px;font-size:14px;line-height:1.7" class="dim"><b style="color:var(--tx)">А дальше — глубже</b>
 <div><a href="${waLink("Здравствуйте, Венера! Я прошла игру «Своё место». Расскажите, пожалуйста, о Квантовом Взлёте. Мой код: "+code)}" target="_blank" rel="noopener" style="color:var(--gold)">Квантовый Взлёт — 3 месяца со мной</a></div>
